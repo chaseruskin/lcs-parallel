@@ -1,0 +1,3 @@
+[submodule "lcs_parallel"]
+	path = lcs_parallel
+	url = https://github.com/RayhanShikder/lcs_parallel.git
