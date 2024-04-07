@@ -88,7 +88,22 @@ Data File | Sequence Length | Execution Times (sec) | Average Time (sec)
 
 # 2. Comparison with Published Results
 
-TODO
+The following table approximates the recorded measurements referenced in the paper's graph (Figure 2 (a)).
+
+![](./images/fig2a.png)
+
+Data File | Sequence Length | Sequential (sec) | MPI (sec) | OpenMP (sec) | OpenMP+MPI (sec)
+-- | -- | -- | -- | -- | -- |
+1 | 128    | ~0 | ~0 | ~0 | ~0
+2 | 256    | ~0 | ~0 | ~0 | ~0
+3 | 512    | ~0 | ~0 | ~0 | ~0
+4 | 1024   | ~0 | 1 | ~0 | 1
+5 | 2048   | ~0 | 2.5 | ~0 | 2
+6 | 4096   | ~0 | 5 | ~0 | 4
+7 | 8192   | 0.5 | 11 | ~0 | 10
+8 | 16384  | 2 | 28 | 0.5 | 32
+9 | 32768  | 7 | 33 | 4 | 40
+
 
 # References
 
