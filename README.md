@@ -60,6 +60,20 @@ Data File | Sequence Length | Execution Times (sec) | Average Time (sec) |
 
 This resource configuration used 4 MPI ranks, with 1 node per rank, along with 8 HW threads with 2 SW threads (OMP threads) per HW thread. Therefore, there was a total of 16 threads per MPI rank.
 
+Expected Output: _lcs_parallel/Experimental Codes/hybrid/row_wise_v2/output.txt_
+```
+chunk_p: 1 chunk_dp: 8192 procs: 4
+lcs_yang_v2 is: 9793
+time taken for lcs_yang_v2 is: 84.181711
+```
+Received Output:
+```
+Your input file: /home/c.ruskin/eel6763/project/data/9.txt 
+chunk_p: 1 chunk_dp: 8192 procs: 4
+lcs_yang_v2 is: 9793
+time taken for lcs_yang_v2 is: 18.410843
+```
+
 Data File | Sequence Length | Execution Times (sec) | Average Time (sec)
 -- | -- | -- | -- |
 1 | 128    |
@@ -70,7 +84,7 @@ Data File | Sequence Length | Execution Times (sec) | Average Time (sec)
 6 | 4096   |
 7 | 8192   |
 8 | 16384  | 73.621940 7.296778 14.122365 14.062538 61.619310 5.462781 59.965208 | 33.7358
-9 | 32768  | 5.878036 75.386506 52.658042 4.455568 16.348655 18.984072 37.001678 13.972587 11.180536 2.654305 8.979272 | 22.4999
+9 | 32768  | 5.878036 75.386506 52.658042 4.455568 16.348655 18.984072 37.001678 13.972587 11.180536 2.654305 8.979272 18.410843 | 22.1592
 
 # 2. Comparison with Published Results
 
