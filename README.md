@@ -14,8 +14,8 @@ To replicate the results and port to HiPerGator, we compiled the source code for
 
 ### Sequential
 
-Data File | Sequence Length | Execution Times |
--- | -- | -- |
+Data File | Sequence Length | Execution Times (sec) | Average Time (sec) |
+-- | -- | -- | -- |
 1 | 128    |
 2 | 256    |
 3 | 512    |
@@ -28,8 +28,8 @@ Data File | Sequence Length | Execution Times |
 
 ### MPI
 
-Data File | Sequence Length | Execution Times |
--- | -- | -- |
+Data File | Sequence Length | Execution Times (sec) | Average Time (sec) |
+-- | -- | -- | -- |
 1 | 128    |
 2 | 256    |
 3 | 512    |
@@ -44,8 +44,8 @@ Data File | Sequence Length | Execution Times |
 
 This resource configuration used 16 HW threads, with 1 SW thread (OMP thread) per HW thread.
 
-Data File | Sequence Length | Execution Times |
--- | -- | -- |
+Data File | Sequence Length | Execution Times (sec) | Average Time (sec) |
+-- | -- | -- | -- |
 1 | 128    |
 2 | 256    |
 3 | 512    |
@@ -53,15 +53,15 @@ Data File | Sequence Length | Execution Times |
 5 | 2048   |
 6 | 4096   |
 7 | 8192   |
-8 | 16384  | 0.764816 5.962355 1.543291 3.058150 0.840464
-9 | 32768  | 4.186157 1.117337 6.321267 4.008988 1.214055 1.929784 1.033326
+8 | 16384  | 0.764816 5.962355 1.543291 3.058150 0.840464 | 2.4338
+9 | 32768  | 4.186157 1.117337 6.321267 4.008988 1.214055 1.929784 1.033326 | 2.8301
 
 ### OpenMP+MPI
 
 This resource configuration used 4 MPI ranks, with 1 node per rank, along with 8 HW threads with 2 SW threads (OMP threads) per HW thread. Therefore, there was a total of 16 threads per MPI rank.
 
-Data File | Sequence Length | Execution Times |
--- | -- | -- |
+Data File | Sequence Length | Execution Times (sec) | Average Time (sec)
+-- | -- | -- | -- |
 1 | 128    |
 2 | 256    |
 3 | 512    |
@@ -69,8 +69,8 @@ Data File | Sequence Length | Execution Times |
 5 | 2048   |
 6 | 4096   |
 7 | 8192   |
-8 | 16384  | 73.621940 7.296778 14.122365 14.062538 61.619310 5.462781 59.965208
-9 | 32768  | 5.878036 75.386506 52.658042 4.455568 16.348655 18.984072 37.001678 13.972587 11.180536 2.654305 8.979272
+8 | 16384  | 73.621940 7.296778 14.122365 14.062538 61.619310 5.462781 59.965208 | 33.7358
+9 | 32768  | 5.878036 75.386506 52.658042 4.455568 16.348655 18.984072 37.001678 13.972587 11.180536 2.654305 8.979272 | 22.4999
 
 # 2. Comparison with Published Results
 
