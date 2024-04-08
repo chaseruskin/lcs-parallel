@@ -1,0 +1,90 @@
+128: 0.000371 0.000023 0.000371 0.000020 0.000017 0.000015 0.000016 0.000018 0.000017 0.000015 | 0.0001
+
+--------- 256 ---------
+Time taken by sequential algorithm is: 0.000441 seconds
+Time taken by sequential algorithm is: 0.000049 seconds
+Time taken by sequential algorithm is: 0.000049 seconds
+Time taken by sequential algorithm is: 0.000049 seconds
+Time taken by sequential algorithm is: 0.000046 seconds
+Time taken by sequential algorithm is: 0.000064 seconds
+Time taken by sequential algorithm is: 0.000062 seconds
+Time taken by sequential algorithm is: 0.000048 seconds
+Time taken by sequential algorithm is: 0.000050 seconds
+Time taken by sequential algorithm is: 0.000064 seconds
+--------- 512 ---------
+Time taken by sequential algorithm is: 0.000207 seconds
+Time taken by sequential algorithm is: 0.000207 seconds
+Time taken by sequential algorithm is: 0.000203 seconds
+Time taken by sequential algorithm is: 0.000198 seconds
+Time taken by sequential algorithm is: 0.000201 seconds
+Time taken by sequential algorithm is: 0.000206 seconds
+Time taken by sequential algorithm is: 0.000204 seconds
+Time taken by sequential algorithm is: 0.000205 seconds
+Time taken by sequential algorithm is: 0.000199 seconds
+Time taken by sequential algorithm is: 0.000201 seconds
+--------- 1024 ---------
+Time taken by sequential algorithm is: 0.000779 seconds
+Time taken by sequential algorithm is: 0.000853 seconds
+Time taken by sequential algorithm is: 0.001245 seconds
+Time taken by sequential algorithm is: 0.000796 seconds
+Time taken by sequential algorithm is: 0.000869 seconds
+Time taken by sequential algorithm is: 0.000905 seconds
+Time taken by sequential algorithm is: 0.000810 seconds
+Time taken by sequential algorithm is: 0.000938 seconds
+Time taken by sequential algorithm is: 0.000801 seconds
+Time taken by sequential algorithm is: 0.000814 seconds
+--------- 2048 ---------
+Time taken by sequential algorithm is: 0.002980 seconds
+Time taken by sequential algorithm is: 0.002948 seconds
+Time taken by sequential algorithm is: 0.003000 seconds
+Time taken by sequential algorithm is: 0.002997 seconds
+Time taken by sequential algorithm is: 0.003033 seconds
+Time taken by sequential algorithm is: 0.002953 seconds
+Time taken by sequential algorithm is: 0.003064 seconds
+Time taken by sequential algorithm is: 0.003038 seconds
+Time taken by sequential algorithm is: 0.002962 seconds
+Time taken by sequential algorithm is: 0.002958 seconds
+--------- 4096 ---------
+Time taken by sequential algorithm is: 0.012194 seconds
+Time taken by sequential algorithm is: 0.011941 seconds
+Time taken by sequential algorithm is: 0.011916 seconds
+Time taken by sequential algorithm is: 0.012104 seconds
+Time taken by sequential algorithm is: 0.011995 seconds
+Time taken by sequential algorithm is: 0.011965 seconds
+Time taken by sequential algorithm is: 0.012476 seconds
+Time taken by sequential algorithm is: 0.012556 seconds
+Time taken by sequential algorithm is: 0.012582 seconds
+Time taken by sequential algorithm is: 0.011893 seconds
+--------- 8192 ---------
+Time taken by sequential algorithm is: 0.049810 seconds
+Time taken by sequential algorithm is: 0.049226 seconds
+Time taken by sequential algorithm is: 0.049130 seconds
+Time taken by sequential algorithm is: 0.045651 seconds
+Time taken by sequential algorithm is: 0.049054 seconds
+Time taken by sequential algorithm is: 0.049443 seconds
+Time taken by sequential algorithm is: 0.048955 seconds
+Time taken by sequential algorithm is: 0.049533 seconds
+Time taken by sequential algorithm is: 0.048858 seconds
+Time taken by sequential algorithm is: 0.046275 seconds
+--------- 16384 ---------
+Time taken by sequential algorithm is: 0.231989 seconds
+Time taken by sequential algorithm is: 0.233137 seconds
+Time taken by sequential algorithm is: 0.786195 seconds
+Time taken by sequential algorithm is: 0.789942 seconds
+Time taken by sequential algorithm is: 0.782391 seconds
+Time taken by sequential algorithm is: 0.776745 seconds
+Time taken by sequential algorithm is: 0.784816 seconds
+Time taken by sequential algorithm is: 0.778986 seconds
+Time taken by sequential algorithm is: 0.786684 seconds
+Time taken by sequential algorithm is: 0.788419 seconds
+--------- 32768 ---------
+Time taken by sequential algorithm is: 2.606464 seconds
+Time taken by sequential algorithm is: 2.605415 seconds
+Time taken by sequential algorithm is: 2.609088 seconds
+Time taken by sequential algorithm is: 2.604304 seconds
+Time taken by sequential algorithm is: 2.797391 seconds
+Time taken by sequential algorithm is: 2.868034 seconds
+Time taken by sequential algorithm is: 2.777950 seconds
+Time taken by sequential algorithm is: 2.811413 seconds
+Time taken by sequential algorithm is: 2.661989 seconds
+Time taken by sequential algorithm is: 2.796924 seconds
