@@ -3,7 +3,7 @@ INPUT_SIZE=128
 
 for i in {1..9};
 do
-    echo "---------  ${$((128 * i))} ---------" >> runtimes.txt
+    echo "---------  $((i*128)) ---------" >> runtimes.txt
     export DATA_FILE="$i"
     for i in $(seq 1 10);
     do
