@@ -22,14 +22,14 @@
 #SBATCH --mail-user=joelalvarez@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH --ntasks=4
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=1000mb
 #SBATCH -t 00:05:00
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=1
 
-# DATA_FILE="1"
+DATA_FILE="9"
 
 INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
 
