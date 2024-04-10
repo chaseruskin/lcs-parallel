@@ -30,7 +30,7 @@
 #SBATCH --cpus-per-task=16
 export OMP_NUM_THREADS=16
 
-DATA_FILE="9"
+# DATA_FILE="9"
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
 
 srun --mpi=pmix_v3 -o "hpg-$2.out" -e "hpg-$2.err" $1 $INPUT_PATH
