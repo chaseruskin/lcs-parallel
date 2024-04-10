@@ -29,7 +29,7 @@
 #SBATCH -t 00:05:00
 #SBATCH --cpus-per-task=1
 
-DATA_FILE="9"
+# DATA_FILE="9"
 
 INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
 

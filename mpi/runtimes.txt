@@ -86,4 +86,14 @@ time taken for lcs_yang_v1 is: 0.836243
 time taken for lcs_yang_v1 is: 0.714566
 time taken for lcs_yang_v1 is: 0.778922
 time taken for lcs_yang_v1 is: 0.871328
----------  32768 : 2024-04-09 21:50:06 ---------
+---------  32768 : 2024-04-09 22:04:15 ---------
+time taken for lcs_yang_v2 is: 2.878253
+time taken for lcs_yang_v2 is: 2.999817
+time taken for lcs_yang_v2 is: 2.994717
+time taken for lcs_yang_v2 is: 3.254026
+time taken for lcs_yang_v2 is: 3.261782
+time taken for lcs_yang_v2 is: 3.206938
+time taken for lcs_yang_v2 is: 3.324159
+time taken for lcs_yang_v2 is: 3.245434
+time taken for lcs_yang_v2 is: 2.060970
+time taken for lcs_yang_v2 is: 2.098348
