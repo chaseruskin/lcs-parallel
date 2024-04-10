@@ -108,3 +108,74 @@ total time taken: 10.520482
 total time taken: 1.168947
 total time taken: 15.430236
 total time taken: 1.728614
+--------- 32768 : 2024-04-09 22:36:21 ---------
+--------- 32768 : 2024-04-09 22:37:10 ---------
+---------  8192 : 2024-04-09 22:38:02 ---------
+total time taken: 2.808206
+total time taken: 4.806963
+total time taken: 5.015081
+total time taken: 17.326241
+total time taken: 25.926711
+total time taken: 2.586185
+total time taken: 4.392892
+total time taken: 2.676842
+total time taken: 1.952691
+total time taken: 12.808595
+---------  16384 : 2024-04-09 22:40:04 ---------
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+---------  32768 : 2024-04-09 22:40:43 ---------
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+total time taken: 12.808595
+---------  8192 : 2024-04-09 22:40:50 ---------
+---------  16384 : 2024-04-09 22:41:26 ---------
+---------  32768 : 2024-04-09 22:41:28 ---------
+---------  8192 : 2024-04-09 22:42:10 ---------
+total time taken: 0.923114
+total time taken: 4.501407
+total time taken: 4.485771
+total time taken: 4.584836
+total time taken: 7.179806
+total time taken: 9.383485
+total time taken: 1.348149
+total time taken: 6.805354
+total time taken: 7.809080
+total time taken: 6.006492
+---------  16384 : 2024-04-09 22:43:45 ---------
+total time taken: 12.892225
+total time taken: 1.184058
+total time taken: 6.182760
+total time taken: 8.189755
+total time taken: 1.050046
+total time taken: 9.687140
+total time taken: 29.044876
+total time taken: 52.585254
+total time taken: 9.019256
+total time taken: 168.340674
+---------  32768 : 2024-04-09 22:49:27 ---------
+total time taken: 102.039546
+total time taken: 13.664164
+total time taken: 5.682772
+total time taken: 26.399615
+total time taken: 25.223655
+total time taken: 67.853367
+total time taken: 42.326479
+total time taken: 16.014850
+total time taken: 10.453543
+total time taken: 13.212980
