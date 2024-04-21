@@ -30,7 +30,15 @@
 #SBATCH --cpus-per-task=16
 export OMP_NUM_THREADS=16
 
-# DATA_FILE="9"
+DATA_FILE="10"
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
 
+export GMON_OUT_PREFIX="gmon.out-"
+
 srun --mpi=pmix_v3 -o "hpg-$2.out" -e "hpg-$2.err" $1 $INPUT_PATH
+
+# View gprof summary stats
+# $ gprof ./build/row_wise_v2_space ./build/gmon.sum
+
+# Capture graph using dot format
+# $ gprof ./build/row_wise_v2_space ./build/gmon.sum | gprof2dot | dot -Tpng -o lcs-mpi-profile.png

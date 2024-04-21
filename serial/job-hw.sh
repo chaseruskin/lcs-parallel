@@ -29,7 +29,8 @@
 #SBATCH -t 00:05:00
 #SBATCH --cpus-per-task=1
 
-# DATA_FILE="9"
-INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
+DATA_FILE="9"
+INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
+# INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
 
 srun --mpi=pmix_v3 -o "hpg-$2.out" -e "hpg-$2.err" $1 $INPUT_PATH

@@ -22,15 +22,27 @@
 #SBATCH --mail-user=joelalvarez@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
-#SBATCH --nodes=4
-#SBATCH --ntasks=4
+#SBATCH --nodes=32
+#SBATCH --ntasks=32
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=1000mb
 #SBATCH -t 00:05:00
 #SBATCH --cpus-per-task=1
 
-# DATA_FILE="9"
+DATA_FILE="11"
 
-INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
+INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
+# INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
+
+export GMON_OUT_PREFIX="gmon.out-"
 
 srun --mpi=pmix_v3 -o "hpg-$2.out" -e "hpg-$2.err" $1 $INPUT_PATH
+
+# Run application
+# $ al ./row_wise_v2_space.c ./lcs.c --mpi --wait --gprof
+
+# View gprof summary stats
+# $ gprof ./build/row_wise_v2_space ./build/gmon.sum
+
+# Capture graph using dot format
+# $ gprof ./build/row_wise_v2_space ./build/gmon.sum | gprof2dot | dot -Tpng -o lcs-mpi-profile.png

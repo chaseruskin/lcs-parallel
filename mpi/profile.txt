@@ -1,0 +1,87 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  Ts/call  Ts/call  name    
+100.01      1.92     1.92                             main
+
+
+PROFILE RAW RESULTS (11.txt):
+
+#SBATCH --nodes=4
+#SBATCH --ntasks=4
+#SBATCH --ntasks-per-node=1
+
+*** RUN W/O GPROF
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 50.016128
+
+*** RUN W/ GPROF
+
+Flat profile:
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 99.96     38.78    38.78        4     9.70     9.70  lcs_yang_v2
+  0.03     38.79     0.01                             _intel_fast_memcpy
+  0.01     38.80     0.01                             __intel_sse2_strdup
+  0.01     38.80     0.01                             __intel_sse2_strncat
+  0.00     38.80     0.00        4     0.00     0.00  calc_P_matrix_v2
+
+
+#SBATCH --nodes=8
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=1
+
+Your input file is /home/c.ruskin/eel6763/project/data/11.txt 
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+chunk_dp: 16384 procs: 8
+lcs_yang_v2 is: 127963
+Time taken for lcs_yang_v2 is: 28.240098
+
+
+THIS IS A BUG. We need chunk_p to be >= 1!
+
+Bug is fixed, and now also reduced number of communication calls using MPI because all nodes
+already had the needed information.
+
+
+#SBATCH --nodes=16
+#SBATCH --ntasks=16
+#SBATCH --ntasks-per-node=1
+
+P := Rank 14 will get chunks 0
+P := Rank 9 will get chunks 0
+P := Rank 12 will get chunks 0
+P := Rank 4 will get chunks 0
+P := Rank 8 will get chunks 0
+P := Rank 13 will get chunks 0
+P := Rank 7 will get chunks 0
+P := Rank 2 will get chunks 1
+P := Rank 15 will get chunks 0
+P := Rank 5 will get chunks 0
+P := Rank 10 will get chunks 0
+P := Rank 3 will get chunks 1
+P := Rank 6 will get chunks 0
+P := Rank 1 will get chunks 1
+P := Rank 11 will get chunks 0
+
+Your input file is /home/c.ruskin/eel6763/project/data/11.txt 
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+P := Rank 0 will get chunks 1
+chunk_dp: 8192 procs: 16
+lcs_yang_v2 is: 127963
+Time taken for lcs_yang_v2 is: 28.534859
+
+
+#SBATCH --nodes=32
+#SBATCH --ntasks=32
+#SBATCH --ntasks-per-node=1
+

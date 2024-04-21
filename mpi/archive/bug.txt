@@ -1,0 +1,36 @@
+[c0700a-s3:938365:0:938365] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+[c0700a-s16:331963:0:331963] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+==== backtrace (tid: 938365) ====
+ 0 0x0000000000012cf0 __funlockfile()  :0
+ 1 0x0000000000084191 __isoc99_fscanf()  ???:0
+ 2 0x0000000000401fcc main()  ???:0
+ 3 0x000000000003ad85 __libc_start_main()  ???:0
+ 4 0x0000000000401e2e _start()  ???:0
+=================================
+[c0700a-s12:2658998:0:2658998] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+==== backtrace (tid: 331963) ====
+ 0 0x0000000000012cf0 __funlockfile()  :0
+ 1 0x0000000000084191 __isoc99_fscanf()  ???:0
+ 2 0x0000000000401fcc main()  ???:0
+ 3 0x000000000003ad85 __libc_start_main()  ???:0
+ 4 0x0000000000401e2e _start()  ???:0
+=================================
+==== backtrace (tid:2658998) ====
+ 0 0x0000000000012cf0 __funlockfile()  :0
+ 1 0x0000000000084191 __isoc99_fscanf()  ???:0
+ 2 0x0000000000401fcc main()  ???:0
+ 3 0x000000000003ad85 __libc_start_main()  ???:0
+ 4 0x0000000000401e2e _start()  ???:0
+=================================
+[c0700a-s1:4176659:0:4176659] Caught signal 11 (Segmentation fault: address not mapped to object at address (nil))
+==== backtrace (tid:4176659) ====
+ 0 0x0000000000012cf0 __funlockfile()  :0
+ 1 0x0000000000084191 __isoc99_fscanf()  ???:0
+ 2 0x0000000000401fcc main()  ???:0
+ 3 0x000000000003ad85 __libc_start_main()  ???:0
+ 4 0x0000000000401e2e _start()  ???:0
+=================================
+
+
+
+### BUG WAS RESOLVED. NEEDED TO UPDATE THE PATH TO CORRECT LOCATION IN JOB-HW.SH
