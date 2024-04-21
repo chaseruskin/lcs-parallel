@@ -110,6 +110,10 @@ The graphical results of our experimental porting of the application to the HiPe
 
 ![](./images/port-results.png)
 
+# 3. Application Profiling
+
+We proceeded with using the MPI version of the code to identify potential bottlenecks in increasingly large data sets. We used `gprof` to measure the time for each function.
+
 # References
 
 [1] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6458724/  
