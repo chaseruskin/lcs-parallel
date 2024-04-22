@@ -4,7 +4,8 @@
 //
 // Finds the longest common subsequence (LCS) from a file storing DNA data.
 //
-// This file is adapted from an existing repository (https://github.com/RayhanShikder/lcs_parallel).
+// This file is adapted from an existing implementation (https://github.com/RayhanShikder/lcs_parallel)
+// in an attempt to improve its performance on UF's HiPerGator HPC computing platform.
 
 #include<stdio.h>
 #include<string.h>
@@ -14,17 +15,20 @@
 #include <stdint.h>
 #include "lcs.h"
 
-
+// Constants
+#define DEBUG 0
 #define CAPTAIN 0
 
-//global variables
-char *string_A;
-char *string_B;
-char *unique_chars_C; //unique alphabets
-int c_len;
+// Global variables
+char *A_str;
+char *B_str;
+char *C_ustr; 
 int *P_Matrix;
-int *DP_Results; //to store the DP values
+int *DP_Results;
 int *dp_prev_row;
+
+struct timespec *begin;
+struct timespec *end;
 
 
 int main(int argc, char *argv[]) {
@@ -33,23 +37,22 @@ int main(int argc, char *argv[]) {
 
     int my_rank;
     int num_procs;
-    // chunk sizes for DP matrix
     int chunk_size_dp; 
-    int res;
+    int result;
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); // grab this process's rank
-    MPI_Comm_size(MPI_COMM_WORLD, &num_procs); //grab the total num of processes
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
     if(argc <= 1) {
         printf("Error: No input file specified! Please specify the input file, and run again!\n");
         return 0;
     }
 
-    int len_a, len_b;
+    int len_a, len_b, len_c;
     double start_time, stop_time;
 
     if(my_rank == CAPTAIN) {
-        printf("\nYour input file is %s \n", argv[1]);
+        printf("Loading DNA file \"%s\" on each process...\n", argv[1]);
     }
 
     FILE *fp = fopen(argv[1], "r");
@@ -58,58 +61,74 @@ int main(int argc, char *argv[]) {
         exit(101);
     }
     
-    fscanf(fp, "%d %d %d", &len_a, &len_b, &c_len);
+    fscanf(fp, "%d %d %d", &len_a, &len_b, &len_c);
 
-    string_A = (char *)malloc((len_a+1) * sizeof(char *));
-    string_B = (char *)malloc((len_b+1) * sizeof(char *));
-    unique_chars_C = (char *)malloc((c_len+1) * sizeof(char *));
+    A_str = (char *)malloc((len_a+1) * sizeof(char *));
+    B_str = (char *)malloc((len_b+1) * sizeof(char *));
+    // the set of unique characters
+    C_ustr = (char *)malloc((len_c+1) * sizeof(char *));
 
-    fscanf(fp, "%s %s %s", string_A, string_B, unique_chars_C);
+    fscanf(fp, "%s %s %s", A_str, B_str, C_ustr);
 
     if(my_rank == CAPTAIN) {
-        printf("Length of string B: %zu \nLength of string C: %zu\n", strlen(string_B), strlen(unique_chars_C));
-        printf("String C is: %s\n",unique_chars_C);
+        printf("Length of string B: %zu \n", strlen(B_str));
+        printf("Length of string C: %zu\n", strlen(C_ustr));
+        printf("String C is: %s\n", C_ustr);
     }
+    
+    // partition the number of units among all processes evenly
+    chunk_size_dp = get_computation_size(len_b+1, my_rank, num_procs);
 
-    chunk_size_dp = ((len_b+1)/num_procs);
-
-    printf("P := Rank %d will get chunks %d\n", my_rank, get_computation_size(c_len, my_rank, num_procs));
-
-    if(my_rank == CAPTAIN) {
-        printf("chunk_dp: %d procs: %d\n", chunk_size_dp, num_procs);
+    if(DEBUG > 0) {
+        printf("P := Rank %d assigned %d chunks\n", my_rank, get_computation_size(len_c, my_rank, num_procs));
+        printf("DP := Rank %d assigned %d chunks\n", my_rank, chunk_size_dp);
     }
 
     DP_Results = (int *)malloc((len_b+1) * sizeof(int));
     dp_prev_row = (int *)malloc((len_b+1) * sizeof(int));
 
-    P_Matrix = (int *)malloc((c_len*(len_b+1)) * sizeof(int));
+    P_Matrix = (int *)malloc((len_c*(len_b+1)) * sizeof(int));
 
-    // start the timing
-    start_time = MPI_Wtime();
+    begin = calloc(1, sizeof(struct timespec));
+    end = calloc(1, sizeof(struct timespec));
 
-    calc_P_matrix_v2(P_Matrix, string_B, len_b, unique_chars_C, c_len, my_rank, num_procs);
+    // start timing immediately before distributing data
+    *begin = now();
 
-    res = lcs_yang_v2(DP_Results, dp_prev_row, P_Matrix,string_A,string_B,unique_chars_C,len_a,len_b,c_len,my_rank, chunk_size_dp);
+    calc_P_matrix_v2(P_Matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
+
+    result = lcs_yang_v2(DP_Results, dp_prev_row, P_Matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, chunk_size_dp);
     
     // halt the timing
-    stop_time = MPI_Wtime();
+    *end = now();
 
     if(my_rank == CAPTAIN) {
-        printf("lcs_yang_v2 is: %d\n", res);
-        printf("Time taken for lcs_yang_v2 is: %lf\n", stop_time - start_time);
+        printf("lcs_yang_v2: %d\n", result);
+
+        double exec_time = tdiff(*begin, *end);
+        printf("Execution time: %lf\n", exec_time);
     }
 
-    // if(my_rank == CAPTAIN) {
-    //     for(int i = 0; i < c_len*(len_b+1); i++) {
-    //         printf("%d\t", P_Matrix[i]);
-    //     }
-    //     printf("\n");
-    // }
+    if(DEBUG > 0) {
+        if(my_rank == CAPTAIN) {
+            for(int i = 0; i < len_c*(len_b+1); i++) {
+                printf("%d\t", P_Matrix[i]);
+            }
+            printf("\n");
+        }
+    }
 
+    // deallocate pointers
+    free(A_str);
+    free(B_str);
+    free(C_ustr);
+    free(dp_prev_row);
 
-    //deallocate pointers
     free(P_Matrix);
     free(DP_Results);
+
+    free(begin);
+    free(end);
 
     MPI_Finalize();
     return 0;

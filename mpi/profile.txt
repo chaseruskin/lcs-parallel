@@ -81,7 +81,31 @@ lcs_yang_v2 is: 127963
 Time taken for lcs_yang_v2 is: 28.534859
 
 
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each process...
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 23.648409
+
+
 #SBATCH --nodes=32
 #SBATCH --ntasks=32
 #SBATCH --ntasks-per-node=1
 
+??
+
+
+
+## OpenMP trial
+
+#SBATCH --cpus-per-task=16
+export OMP_NUM_THREADS=16
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 13.434939

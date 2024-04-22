@@ -30,7 +30,7 @@
 #SBATCH --cpus-per-task=16
 export OMP_NUM_THREADS=16
 
-DATA_FILE="10"
+DATA_FILE="11"
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
 
 export GMON_OUT_PREFIX="gmon.out-"

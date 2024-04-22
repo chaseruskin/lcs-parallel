@@ -1,4 +1,27 @@
+// Project: EEL6763 Final Project
+// Author: Joel Alvarez, Chase Ruskin
+// File: lcs.c
+//
+// Finds the longest common subsequence (LCS) from a file storing DNA data.
+//
+// This file is adapted from an existing implementation (https://github.com/RayhanShikder/lcs_parallel)
+// in an attempt to improve its performance on UF's HiPerGator HPC computing platform.
+
 #include "lcs.h"
+
+
+double tdiff(struct timespec a, struct timespec b) {
+    double dt = (( b.tv_sec - a.tv_sec ) + ( b.tv_nsec - a.tv_nsec ) / 1E9);
+    return dt;
+}
+
+
+struct timespec now() {
+    struct timespec t;
+    clock_gettime(CLOCK_REALTIME, &t);
+    return t;
+}
+
 
 int get_computation_size(int N, int rank, int size) {
     uint64_t units_per_rank = (uint64_t)(N) / (uint64_t)(size);
@@ -12,6 +35,7 @@ int get_computation_size(int N, int rank, int size) {
     return comp_size;
 }
 
+
 int get_index_of_character(char *str,char x, int len) {
     for(int i=0; i<len; i++) {
         if(str[i]== x) {
@@ -22,6 +46,7 @@ int get_index_of_character(char *str,char x, int len) {
     return -1;
 }
 
+
 void print_matrix(int **x, int row, int col) {
     for(int i=0; i<row; i++) {
         for(int j=0; j<col; j++) {
@@ -30,6 +55,7 @@ void print_matrix(int **x, int row, int col) {
         printf("\n");
     }
 }
+
 
 void calc_P_matrix_v2(int *P, char *b, int len_b, char *c, int len_c, int rank, int num_ranks) {
 
@@ -90,17 +116,21 @@ void calc_P_matrix_v2(int *P, char *b, int len_b, char *c, int len_c, int rank, 
     MPI_Gatherv(teammate_array_for_scatter_p, chunk_size*(len_b+1), MPI_INT, P, send_counts_p, displacements_p, MPI_INT, CAPTAIN, MPI_COMM_WORLD);
 }
 
+
 void lcs_distribute(int *DP, int chunk_size, int *dp_i_recv) {
     MPI_Scatter(DP, chunk_size, MPI_INT, dp_i_recv, chunk_size, MPI_INT, 0, MPI_COMM_WORLD);
 }
+
 
 void lcs_collect(int *DP, int chunk_size, int *dp_i_recv) {
     MPI_Allgather(dp_i_recv, chunk_size, MPI_INT, DP, chunk_size, MPI_INT, MPI_COMM_WORLD);
 }
 
+
 void lcs_init_distribute(int *P, int count) {
     MPI_Bcast(P, count, MPI_INT, 0, MPI_COMM_WORLD);
 }
+
 
 int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int m, int n, int u, int myrank, int chunk_size)
 {

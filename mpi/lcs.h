@@ -1,3 +1,12 @@
+// Project: EEL6763 Final Project
+// Author: Joel Alvarez, Chase Ruskin
+// File: lcs.h
+//
+// Finds the longest common subsequence (LCS) from a file storing DNA data.
+//
+// This file is adapted from an existing implementation (https://github.com/RayhanShikder/lcs_parallel)
+// in an attempt to improve its performance on UF's HiPerGator HPC computing platform.
+
 #pragma once
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +20,12 @@
 #define max(x,y) ((x)>(y)?(x):(y))
 
 #define CAPTAIN 0
+
+// Find the time difference (b - a).
+double tdiff(struct timespec a, struct timespec b);
+
+// Return the current time.
+struct timespec now();
 
 // Return the number of computational "units" for rank `rank` when there are 
 // `N` units and `size` ranks.

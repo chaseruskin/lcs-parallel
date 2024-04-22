@@ -22,8 +22,8 @@
 #SBATCH --mail-user=joelalvarez@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
-#SBATCH --nodes=32
-#SBATCH --ntasks=32
+#SBATCH --nodes=16
+#SBATCH --ntasks=16
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=1000mb
 #SBATCH -t 00:05:00
