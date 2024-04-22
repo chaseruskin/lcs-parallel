@@ -31,6 +31,13 @@ Each sample counts as 0.01 seconds.
   0.01     38.80     0.01                             __intel_sse2_strncat
   0.00     38.80     0.00        4     0.00     0.00  calc_P_matrix_v2
 
+!!!
+Could not run it before because of how P was calculated (could only go up to 4 nodes).
+
+THIS IS A BUG. We need chunk_p to be >= 1!
+
+Bug is fixed, and now also reduced number of communication calls using MPI because all nodes
+already had the needed information.
 
 #SBATCH --nodes=8
 #SBATCH --ntasks=8
@@ -45,10 +52,7 @@ lcs_yang_v2 is: 127963
 Time taken for lcs_yang_v2 is: 28.240098
 
 
-THIS IS A BUG. We need chunk_p to be >= 1!
 
-Bug is fixed, and now also reduced number of communication calls using MPI because all nodes
-already had the needed information.
 
 
 #SBATCH --nodes=16
@@ -89,12 +93,106 @@ lcs_yang_v2: 127963
 Execution time: 23.648409
 
 
+# example profile using custom profiling (for fine granularity)
+
+Rank 7 P matrix mpi broadcast time: 0.089014
+Iterations: 131073
+Rank 7 DP partial computation time iteration 2: 0.000016
+Rank 7 DP matrix mpi allgather time iteration 2: 0.000314
+Rank 7 DP matrix previous row update time iteration 2: 0.000027
+Rank 3 P matrix computation time: 0.000412
+Rank 3 P matrix mpi broadcast time: 0.073935
+Iterations: 131073
+Rank 3 DP partial computation time iteration 2: 0.000015
+Rank 3 DP matrix mpi allgather time iteration 2: 0.000418
+Rank 3 DP matrix previous row update time iteration 2: 0.000017
+Rank 12 P matrix mpi broadcast time: 0.089032
+Iterations: 131073
+Rank 12 DP partial computation time iteration 2: 0.000015
+Rank 12 DP matrix mpi allgather time iteration 2: 0.000361
+Rank 12 DP matrix previous row update time iteration 2: 0.000020
+Rank 6 P matrix mpi broadcast time: 0.087685
+Iterations: 131073
+Rank 6 DP partial computation time iteration 2: 0.000026
+Rank 6 DP matrix mpi allgather time iteration 2: 0.000194
+Rank 6 DP matrix previous row update time iteration 2: 0.000045
+Rank 14 P matrix mpi broadcast time: 0.085780
+Iterations: 131073
+Rank 14 DP partial computation time iteration 2: 0.000016
+Rank 14 DP matrix mpi allgather time iteration 2: 0.000345
+Rank 14 DP matrix previous row update time iteration 2: 0.000054
+Rank 10 P matrix mpi broadcast time: 0.092918
+Iterations: 131073
+Rank 10 DP partial computation time iteration 2: 0.000016
+Rank 10 DP matrix mpi allgather time iteration 2: 0.000433
+Rank 10 DP matrix previous row update time iteration 2: 0.000033
+Rank 8 P matrix mpi broadcast time: 0.084872
+Iterations: 131073
+Rank 8 DP partial computation time iteration 2: 0.000015
+Rank 8 DP matrix mpi allgather time iteration 2: 0.000538
+Rank 8 DP matrix previous row update time iteration 2: 0.000021
+Rank 11 P matrix mpi broadcast time: 0.091256
+Iterations: 131073
+Rank 11 DP partial computation time iteration 2: 0.000015
+Rank 11 DP matrix mpi allgather time iteration 2: 0.000390
+Rank 11 DP matrix previous row update time iteration 2: 0.000025
+Rank 13 P matrix mpi broadcast time: 0.087345
+Iterations: 131073
+Rank 13 DP partial computation time iteration 2: 0.000015
+Rank 13 DP matrix mpi allgather time iteration 2: 0.000351
+Rank 13 DP matrix previous row update time iteration 2: 0.000020
+Rank 4 P matrix mpi broadcast time: 0.087147
+Iterations: 131073
+Rank 4 DP partial computation time iteration 2: 0.000015
+Rank 4 DP matrix mpi allgather time iteration 2: 0.000346
+Rank 4 DP matrix previous row update time iteration 2: 0.000017
+Rank 15 P matrix mpi broadcast time: 0.091289
+Iterations: 131073
+Rank 15 DP partial computation time iteration 2: 0.000015
+Rank 15 DP matrix mpi allgather time iteration 2: 0.000321
+Rank 15 DP matrix previous row update time iteration 2: 0.000030
+Rank 5 P matrix mpi broadcast time: 0.087914
+Iterations: 131073
+Rank 5 DP partial computation time iteration 2: 0.000016
+Rank 5 DP matrix mpi allgather time iteration 2: 0.000355
+Rank 5 DP matrix previous row update time iteration 2: 0.000027
+Rank 1 P matrix computation time: 0.000411
+Rank 1 P matrix mpi broadcast time: 0.072598
+Iterations: 131073
+Rank 1 DP partial computation time iteration 2: 0.000018
+Rank 1 DP matrix mpi allgather time iteration 2: 0.000422
+Rank 1 DP matrix previous row update time iteration 2: 0.000027
+Rank 9 P matrix mpi broadcast time: 0.085809
+Iterations: 131073
+Rank 9 DP partial computation time iteration 2: 0.000016
+Rank 9 DP matrix mpi allgather time iteration 2: 0.000474
+Rank 9 DP matrix previous row update time iteration 2: 0.000024
+Rank 2 P matrix computation time: 0.000475
+Rank 2 P matrix mpi broadcast time: 0.076202
+Iterations: 131073
+Rank 2 DP partial computation time iteration 2: 0.000016
+Rank 2 DP matrix mpi allgather time iteration 2: 0.000432
+Rank 2 DP matrix previous row update time iteration 2: 0.000018
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes...
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+Rank 0 P matrix computation time: 0.000343
+Rank 0 P matrix mpi gather time: 0.012649
+Rank 0 P matrix mpi broadcast time: 0.069490
+Iterations: 131073
+Rank 0 DP partial computation time iteration 2: 0.000016
+Rank 0 DP matrix mpi allgather time iteration 2: 0.000554
+Rank 0 DP matrix previous row update time iteration 2: 0.000022
+lcs_yang_v2: 127963
+Execution time: 39.254834
+
+
 #SBATCH --nodes=32
 #SBATCH --ntasks=32
 #SBATCH --ntasks-per-node=1
 
 ??
-
 
 
 ## OpenMP trial
@@ -109,3 +207,101 @@ length of string B: 131071
 string C is: ATCG
 lcs_yang_v2 is: 127963
 total time taken: 13.434939
+
+
+#SBATCH --cpus-per-task=32
+export OMP_NUM_THREADS=32
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 19.375975
+
+
+
+
+
+## HYBRID
+
+#SBATCH --nodes=2
+#SBATCH --ntasks=2
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem-per-cpu=1000mb
+#SBATCH -t 00:05:00
+#SBATCH --cpus-per-task=16
+export OMP_NUM_THREADS=16
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 2 processes (16 threads per rank)...
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 18.664496
+
+
+#SBATCH --nodes=4
+#SBATCH --ntasks=4
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem-per-cpu=1000mb
+#SBATCH -t 00:05:00
+#SBATCH --cpus-per-task=8
+export OMP_NUM_THREADS=8
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 4 processes (8 threads per rank)...
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 23.715941
+
+
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=2
+#SBATCH --ntasks-per-node=2
+#SBATCH --ntasks-per-socket=2
+#SBATCH --sockets-per-node=1
+#SBATCH --mem-per-cpu=1000mb
+#SBATCH -t 00:05:00
+#SBATCH --cpus-per-task=8
+export OMP_NUM_THREADS=8
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 2 processes (8 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 16.169379
+
+
+
+# RETURN OF OMP (plus using -O2 flag)
+
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem-per-cpu=1000mb
+#SBATCH -t 00:05:00
+#SBATCH --cpus-per-task=16
+export OMP_NUM_THREADS=16
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 3.915658
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 3.916268

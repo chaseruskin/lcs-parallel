@@ -13,13 +13,22 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "mpi.h"
+#include "omp.h"
 #include <time.h>
 
 // Macros
 #define ALPHABET_LENGTH 4
 #define max(x,y) ((x)>(y)?(x):(y))
 
+#define PROFILE 0
+#define USE_VERSION 1
+#define DEBUG 0
 #define CAPTAIN 0
+// the iteration in the main loop when to take an execution time sample for the yang algorithm
+#define PROFILE_YANG_ITER_SAMPLE 2
+
+struct timespec *begin;
+struct timespec *end;
 
 // Find the time difference (b - a).
 double tdiff(struct timespec a, struct timespec b);
@@ -35,13 +44,11 @@ int get_index_of_character(char *str,char x, int len);
 
 void print_matrix(int **x, int row, int col);
 
-void calc_P_matrix_v2(int *P, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
+void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
 
-int lcs_yang_v2(int *DP, int *prev_row,  int *P, char *A, char *B, char *C, int m, int n, int u, int myrank, int chunk_size);
+int lcs_yang_v2(int *DP, int *prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self);
 
 // additional "break-out" functions to help identify bottlenecks in application when profiling
-void lcs_collect(int *DP, int chunk_size, int *dp_i_recv);
+void sync_dp(int *DP, int *dp_i_recv, int chunk_size);
 
-void lcs_distribute(int *DP, int chunk_size, int *dp_i_recv);
-
-void lcs_init_distribute(int *P, int count);
+void distribute_p(int *P, int count, int rank);

@@ -7,17 +7,14 @@
 // This file is adapted from an existing implementation (https://github.com/RayhanShikder/lcs_parallel)
 // in an attempt to improve its performance on UF's HiPerGator HPC computing platform.
 
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "mpi.h"
-#include<time.h>
+#include "omp.h"
+#include <time.h>
 #include <stdint.h>
 #include "lcs.h"
-
-// Constants
-#define DEBUG 0
-#define CAPTAIN 0
 
 // Global variables
 char *A_str;
@@ -26,9 +23,6 @@ char *C_ustr;
 int *P_Matrix;
 int *DP_Results;
 int *dp_prev_row;
-
-struct timespec *begin;
-struct timespec *end;
 
 
 int main(int argc, char *argv[]) {
@@ -52,7 +46,20 @@ int main(int argc, char *argv[]) {
     double start_time, stop_time;
 
     if(my_rank == CAPTAIN) {
-        printf("Loading DNA file \"%s\" on each process...\n", argv[1]);
+        // print stats about resource utilization
+        #pragma omp parallel
+        {   
+            #pragma omp single
+            {
+                printf("Loading DNA file \"%s\" on each of %d processes (%d threads per rank)...\n", argv[1], num_procs, omp_get_num_threads());
+                if(USE_VERSION == 1) {
+                    printf("Branching: enabled (version 1)\n");
+                } else {
+                    printf("Branching: disabled (version 2)\n");
+                }
+
+            }
+        }
     }
 
     FILE *fp = fopen(argv[1], "r");
@@ -62,6 +69,10 @@ int main(int argc, char *argv[]) {
     }
     
     fscanf(fp, "%d %d %d", &len_a, &len_b, &len_c);
+
+    // define the number of rows and columns in the P matrix
+    int ROWS = len_c;
+    int COLS = len_b+1;
 
     A_str = (char *)malloc((len_a+1) * sizeof(char *));
     B_str = (char *)malloc((len_b+1) * sizeof(char *));
@@ -87,7 +98,7 @@ int main(int argc, char *argv[]) {
     DP_Results = (int *)malloc((len_b+1) * sizeof(int));
     dp_prev_row = (int *)malloc((len_b+1) * sizeof(int));
 
-    P_Matrix = (int *)malloc((len_c*(len_b+1)) * sizeof(int));
+    P_Matrix = (int *)malloc((ROWS*(COLS)) * sizeof(int));
 
     begin = calloc(1, sizeof(struct timespec));
     end = calloc(1, sizeof(struct timespec));
