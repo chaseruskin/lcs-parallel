@@ -47,16 +47,6 @@ int get_index_of_character(char *str, char x, int len) {
 }
 
 
-void print_matrix(int **x, int row, int col) {
-    for(int i=0; i<row; i++) {
-        for(int j=0; j<col; j++) {
-            printf("%d ",x[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-
 void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks) {
 
     if(PROFILE > 0) {
@@ -121,6 +111,7 @@ void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int
 
 
 void sync_dp(int *DP, int *dp_i_recv, int chunk_size) {
+    // maybe use async send/recv with a barrier?
     MPI_Allgather(dp_i_recv, chunk_size, MPI_INT, DP, chunk_size, MPI_INT, MPI_COMM_WORLD);
 }
 
@@ -147,7 +138,10 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
 
     int start_id = (rank * units_per_self);
     int end_id = (rank * units_per_self) + units_per_self;
-    
+
+    int lowest_access = start_id+end_id+1;
+    int highest_access = -1;
+
     for(int i=1; i < m+1; i++) {
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
@@ -168,6 +162,7 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
                 j = j+1;
             }
             /* VERSION 1 (branching implementation) */
+            // NOTE: may not be working correctly? see test on 1.txt
             if(USE_VERSION == 1) {
                 if(A[i-1] == B[j-1]) {
                     partial_dp_local[j-start_id] = prev_row[j-1] + 1;
@@ -178,11 +173,35 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
                 else {
                     partial_dp_local[j-start_id] = max(prev_row[j], prev_row[P[(c_i*(n+1))+j]-1] + 1);
                 }
+                if(DEBUG > 0) {
+                    // printf("Rank %d iteration i = %d j = %d: prev_row accesses %d %d %d\n", rank, i, j, j-1, j, P[(c_i*(n+1))+j]-1);
+                }
             /* VERSION 2 (no branching implementation) */
+            // NOTE: sometimes neither of them work!...
             } else {
                 t = (0-P[(c_i*(n+1))+j]) < 0;
                 s = (0 - (prev_row[j] - (t*prev_row[P[(c_i*(n+1))+j]-1]) ));
                 partial_dp_local[j-start_id] = ((t^1)||(s^0))*(prev_row[j]) + (!((t^1)||(s^0)))*(prev_row[P[(c_i*(n+1))+j]-1] + 1);
+            }
+            if(DEBUG > 0) {
+                if(highest_access < j-1) {
+                    highest_access = j-1;
+                }
+                if(lowest_access > j-1) {
+                    lowest_access = j-1;
+                }
+                if(highest_access < j) {
+                    highest_access = j;
+                }
+                if(lowest_access > j) {
+                    lowest_access = j;
+                }
+                if(highest_access < P[(c_i*(n+1))+j]-1) {
+                    highest_access = P[(c_i*(n+1))+j]-1;
+                }
+                if(lowest_access > P[(c_i*(n+1))+j]-1) {
+                    lowest_access = P[(c_i*(n+1))+j]-1;
+                }
             }
         }
 
@@ -214,6 +233,10 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
                 printf("Rank %d DP matrix previous row update time iteration %d: %f\n", rank, i, exec_time);
             }
         }
+    }
+    if(DEBUG > 0) {
+        printf("Rank %d start_id %d end_id %d\n", rank, start_id, end_id);
+        printf("Rank %d lowest_access %d highest_access %d\n", rank, lowest_access, highest_access);
     }
     return DP[n];
 }

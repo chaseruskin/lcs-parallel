@@ -19,7 +19,7 @@
 
 #SBATCH --job-name=al
 #SBATCH --mail-type=FAIL
-#SBATCH --mail-user=joelalvarez@ufl.edu
+#SBATCH --mail-user=c.ruskin@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
 #SBATCH --nodes=1
@@ -29,7 +29,7 @@
 #SBATCH -t 00:05:00
 #SBATCH --cpus-per-task=1
 
-DATA_FILE="11"
+DATA_FILE="3"
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
 # INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
 

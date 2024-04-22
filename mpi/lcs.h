@@ -22,7 +22,7 @@
 
 #define PROFILE 0
 #define USE_VERSION 1
-#define DEBUG 0
+#define DEBUG 1
 #define CAPTAIN 0
 // the iteration in the main loop when to take an execution time sample for the yang algorithm
 #define PROFILE_YANG_ITER_SAMPLE 2
@@ -41,8 +41,6 @@ struct timespec now();
 int get_computation_size(int N, int rank, int size);
 
 int get_index_of_character(char *str,char x, int len);
-
-void print_matrix(int **x, int row, int col);
 
 void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
 
