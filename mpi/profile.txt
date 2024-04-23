@@ -502,3 +502,18 @@ Length of string C: 4
 String C is: ATCG
 lcs_yang_v2: 9793
 Execution time: 0.243861
+
+
+
+# Improvements (04/23)
+
+- can now configure neighbor distance with #define
+  - can be improved to further maybe determine worst-case rank each neighbor will
+    have to communicate with to set up communication points (in application) while
+    it is running by evaluating P matrix values to see what indices are required for R previous row
+
+  - with each node having global (or enough local) knowledge about who to send data to and where
+    it needs data receieved from, then can break away user level configuration of setting hard-coded
+    neighbor distance
+
+  - still bug with offset not working on rank 0 for 3.txt???

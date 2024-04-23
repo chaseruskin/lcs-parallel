@@ -20,12 +20,19 @@
 #define ALPHABET_LENGTH 4
 #define max(x,y) ((x)>(y)?(x):(y))
 
+// the number of downstream neighbors to collect data from and upstream neighbors to send data to
+#define NEIGHBOR_DIST 1
+
+// various options for debugging and profiling with various implementations
 #define PROFILE 0
-#define USE_VERSION 2
-#define DEBUG 0
-#define CAPTAIN 0
+#define DEBUG 1
 // the iteration in the main loop when to take an execution time sample for the yang algorithm
 #define PROFILE_YANG_ITER_SAMPLE 2
+
+// the version of the yang algorithm to use (1: BRANCHING, 2: NO BRANCHING)
+#define USE_VERSION 1
+// root rank/process ID
+#define CAPTAIN 0
 // tags for message conversations
 #define TAG_NEXT_R_SEGMENT 0
 #define TAG_FINAL_R_VALUE 1
@@ -47,7 +54,7 @@ int get_index_of_character(char *str,char x, int len);
 
 void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
 
-int lcs_yang_v2(int *R_prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs);
+int lcs_yang(int *R_prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs);
 
 // additional "break-out" functions to help identify bottlenecks in application when profiling
 void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int num_procs, MPI_Request *request);

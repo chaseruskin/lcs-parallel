@@ -22,8 +22,8 @@
 #SBATCH --mail-user=c.ruskin@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
-#SBATCH --nodes=32
-#SBATCH --ntasks=32
+#SBATCH --nodes=4
+#SBATCH --ntasks=4
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
 #SBATCH --sockets-per-node=1
@@ -32,7 +32,7 @@
 #SBATCH --cpus-per-task=1
 export OMP_NUM_THREADS=1
 
-DATA_FILE="11"
+DATA_FILE="3"
 
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
 # INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"

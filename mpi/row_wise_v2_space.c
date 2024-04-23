@@ -36,8 +36,9 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
     if(argc <= 1) {
-        printf("Error: No input file specified! Please specify the input file, and run again!\n");
-        return 0;
+        printf("ERROR: No input file specified as a command-line argument.\n");
+        fflush(stdout);
+        MPI_Abort(MPI_COMM_WORLD, 104);
     }
 
     int len_a, len_b, len_c;
@@ -62,8 +63,9 @@ int main(int argc, char *argv[]) {
 
     FILE *fp = fopen(argv[1], "r");
     if(fp == NULL) {
-        printf("Error: Failed to open file \"%s\"\n", argv[1]);
-        exit(101);
+        printf("ERROR: Failed to open file \"%s\".\n", argv[1]);
+        fflush(stdout);
+        MPI_Abort(MPI_COMM_WORLD, 104);
     }
     
     fscanf(fp, "%d %d %d", &len_a, &len_b, &len_c);
@@ -96,7 +98,8 @@ int main(int argc, char *argv[]) {
     // FIXED BUG: using malloc instead of calloc introduced errors in getting results for some cases
     // ENHANCEMENT: Saved space by not required this array at all
     // DP_Results = calloc(len_b+1, sizeof(int));
-    R_prev_row = calloc(len_b+1, sizeof(int));
+    // MORE SPACE OPT: only store NEIGHBOR_DIST neighbors of work required (including self)!
+    R_prev_row = calloc(((NEIGHBOR_DIST+1)*units_per_self), sizeof(int));
 
     P_matrix = calloc(ROWS*COLS, sizeof(int));
 
@@ -108,13 +111,13 @@ int main(int argc, char *argv[]) {
 
     calc_P_matrix_v2(P_matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
 
-    int result = lcs_yang_v2(R_prev_row, P_matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, units_per_self, num_procs);
+    int result = lcs_yang(R_prev_row, P_matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, units_per_self, num_procs);
     
     // halt the timing
     *end = now();
 
     if(my_rank == CAPTAIN) {
-        printf("lcs_yang_v2: %d\n", result);
+        printf("LCS: %d\n", result);
 
         double exec_time = tdiff(*begin, *end);
         printf("Execution time: %lf\n", exec_time);

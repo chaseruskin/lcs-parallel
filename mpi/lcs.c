@@ -114,26 +114,37 @@ void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int 
     // maybe use async send/recv with a barrier?
     switch(rank) {
         case CAPTAIN: {
-            // if we have an upstream neighbor, then send data to it!
-            if(rank+1 < num_procs) {
-                // wait for the last MPI_Isend to complete before progressing further.
-                // MPI_Wait(request, MPI_STATUS_IGNORE);
-                // always just send data to the upstream neighbor
-                MPI_Send(R_part_row, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
+            // wait for the last MPI_Isend to complete before progressing further.
+            // MPI_Wait(request, MPI_STATUS_IGNORE);
+            // always just send data to the upstream neighbor
+            for(int i = 0; i < NEIGHBOR_DIST; i++) {
+                // break early if there are no more neighbors in the chain to pass to
+                if(rank+1+i >= num_procs) {
+                    break;
+                }
+                // if we have an upstream neighbor, then send data to it!
+                MPI_Send(R_part_row, units_per_self, MPI_INT, rank+1+i, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
             }
             break;
         }
         default: {
-            // if we have an upstream neighbor, then send data to it!
-            if(rank+1 < num_procs) {
-                // wait for the last MPI_Isend to complete before progressing further.
-                // MPI_Wait(request, MPI_STATUS_IGNORE);
-                // always just send data to the upstream neighbor
-                MPI_Send(R_part_row, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
+            for(int i = 0; i < NEIGHBOR_DIST; i++) {
+                // break early if there are no more neighbors in the chain to pass to
+                if(rank+1+i >= num_procs) {
+                    break;
+                }
+                // if we have an upstream neighbor, then send data to it!
+                MPI_Send(R_part_row, units_per_self, MPI_INT, rank+1+i, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
             }
             // update the previous row for the next iteration with the current row
-            // receive the computed data from the downstrem neighbor in the right location of the R array
-            MPI_Recv(&R_prev_row[((rank-1)*units_per_self)], units_per_self, MPI_INT, rank-1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  
+            for(int i = 0; i < NEIGHBOR_DIST; i++) {
+                // break early if there are no more neighbors to get data from 
+                if(rank-1-i < 0) {
+                    break;
+                }
+                // receive the computed data from the downstrem neighbor in the right location of the R array
+                MPI_Recv(&R_prev_row[(NEIGHBOR_DIST-1-i)*units_per_self], units_per_self, MPI_INT, rank-1-i, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            }
             break;
         }
     }
@@ -141,7 +152,7 @@ void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int 
     // update the previous row with the latest computed values from this iteration
     #pragma omp parallel for shared(R_part_row) schedule(static)
     for(int i = 0; i < units_per_self; i++) {
-        R_prev_row[(rank*units_per_self)+i] = R_part_row[i];
+        R_prev_row[(NEIGHBOR_DIST*units_per_self)+i] = R_part_row[i];
     }
 }
 
@@ -158,7 +169,7 @@ void distribute_p(int *P, int count, int rank) {
 }
 
 
-int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs) {
+int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs) {
     // distribute the P matrix to all processes
     distribute_p(P, (len_c*(len_b+1)), rank);
 
@@ -180,6 +191,15 @@ int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, i
     int highest_i = -1;
 
     int result = -1;
+
+    // difference to align with partial R previous row for space optimization
+    int offset = ((rank-NEIGHBOR_DIST) * units_per_self);
+    if(rank-NEIGHBOR_DIST < 0) {
+        offset = 0;
+    }
+    if(DEBUG > 0) {
+        printf("Rank %d aligning data in R previous row with offset %d\n", rank, offset);
+    }
 
     MPI_Request request;
 
@@ -206,23 +226,26 @@ int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, i
             /* VERSION 1 (branching implementation) */
             if(USE_VERSION == 1) {
                 if(A[i-1] == B[j-1]) {
-                    R_part_row[j-start_id] = R_prev_row[j-1] + 1;
-                    if((j-1)/units_per_self < rank-1) {
+                    R_part_row[j-start_id] = R_prev_row[j-1-offset] + 1;
+                    if((j-1)/units_per_self < rank-NEIGHBOR_DIST) {
                         printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (j-1)/units_per_self);
+                        fflush(stdout);
                         MPI_Abort(MPI_COMM_WORLD, 101);
                     }
                 }
                 else if(P[(c_i*(n+1))+j] == 0) {
-                    R_part_row[j-start_id] = max(R_prev_row[j], 0);
-                    if(j/units_per_self < rank-1) {
+                    R_part_row[j-start_id] = max(R_prev_row[j-offset], 0);
+                    if(P[(c_i*(n+1))+j]/units_per_self < rank-NEIGHBOR_DIST) {
                         printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, j/units_per_self);
+                        fflush(stdout);
                         MPI_Abort(MPI_COMM_WORLD, 102);
                     }
                 }
                 else {
-                    R_part_row[j-start_id] = max(R_prev_row[j], R_prev_row[P[(c_i*(n+1))+j]-1] + 1);
-                    if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-1) {
+                    R_part_row[j-start_id] = max(R_prev_row[j-offset], R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
+                    if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-NEIGHBOR_DIST) {
                         printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
+                        fflush(stdout);
                         MPI_Abort(MPI_COMM_WORLD, 103);
                     }
                 }
@@ -231,6 +254,12 @@ int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, i
                 t = (0-P[(c_i*(n+1))+j]) < 0;
                 s = (0 - (R_prev_row[j] - (t*R_prev_row[P[(c_i*(n+1))+j]-1]) ));
                 R_part_row[j-start_id] = ((t^1)||(s^0))*(R_prev_row[j]) + (!((t^1)||(s^0)))*(R_prev_row[P[(c_i*(n+1))+j]-1] + 1);
+                
+                if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-NEIGHBOR_DIST) {
+                    printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
+                    fflush(stdout);
+                    MPI_Abort(MPI_COMM_WORLD, 103);
+                }
             }
             if(DEBUG > 0) {
                 if(highest_access < j-1) {
@@ -274,7 +303,7 @@ int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, i
             }
         }
 
-        result = R_prev_row[n];
+        result = R_prev_row[((NEIGHBOR_DIST+1)*units_per_self)-1];
 
         // MPI_Wait(request, status);
 
@@ -298,10 +327,10 @@ int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, i
     if(rank == LAST_RANK) {
         if(DEBUG > 1) {
             printf("LAST RANK R MATRIX:\n");
-            for(int i = 0; i < len_b+1; i++) {
+            for(int i = 0; i < (NEIGHBOR_DIST+1)*units_per_self; i++) {
                 printf("%d\t", R_prev_row[i]);
             }
-            printf("END LAST RANK R MATRIX\n");
+            printf("\nEND LAST RANK R MATRIX\n");
         }
 
         MPI_Send(&result, 1, MPI_INT, CAPTAIN, TAG_FINAL_R_VALUE, MPI_COMM_WORLD);
