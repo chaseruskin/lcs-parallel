@@ -21,7 +21,7 @@ char *A_str;
 char *B_str;
 char *C_ustr; 
 int *P_Matrix;
-int *DP_Results;
+// int *DP_Results;
 int *dp_prev_row;
 
 
@@ -96,7 +96,8 @@ int main(int argc, char *argv[]) {
     }
 
     // FIXED BUG: using malloc instead of calloc introduced errors in getting results for some cases
-    DP_Results = calloc(len_b+1, sizeof(int));
+    // ENHANCEMENT: Saved space by not required this array at all
+    // DP_Results = calloc(len_b+1, sizeof(int));
     dp_prev_row = calloc(len_b+1, sizeof(int));
 
     P_Matrix = calloc(ROWS*COLS, sizeof(int));
@@ -109,7 +110,7 @@ int main(int argc, char *argv[]) {
 
     calc_P_matrix_v2(P_Matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
 
-    result = lcs_yang_v2(DP_Results, dp_prev_row, P_Matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, chunk_size_dp);
+    result = lcs_yang_v2(dp_prev_row, P_Matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, chunk_size_dp, num_procs);
     
     // halt the timing
     *end = now();
@@ -134,10 +135,10 @@ int main(int argc, char *argv[]) {
     free(A_str);
     free(B_str);
     free(C_ustr);
+    
     free(dp_prev_row);
-
     free(P_Matrix);
-    free(DP_Results);
+    // free(DP_Results);
 
     free(begin);
     free(end);

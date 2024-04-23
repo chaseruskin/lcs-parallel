@@ -55,7 +55,37 @@ Time taken for lcs_yang_v2 is: 28.240098
 lcs_yang_v2: 127963
 Execution time: 26.568065
 
+# with improvements to sending partial segments to neighbors using SEND/RECV
+lcs_yang_v2: 127963
+Execution time: 10.925850
 
+lcs_yang_v2: 127963
+Execution time: 10.801264
+
+# with improvements to only updating partial of DP each iteration
+lcs_yang_v2: 127963
+Execution time: 9.765545
+
+# with more improvements to only updating DP array of last row
+lcs_yang_v2: 127963
+Execution time: 9.246861
+
+lcs_yang_v2: 127963
+Execution time: 9.488828
+
+lcs_yang_v2: 127963
+Execution time: 8.565744
+
+# !
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 8 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 7.357747
+
+# ---
 
 #SBATCH --nodes=16
 #SBATCH --ntasks=16

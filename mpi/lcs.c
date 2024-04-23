@@ -110,9 +110,41 @@ void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int
 }
 
 
-void sync_dp(int *DP, int *dp_i_recv, int chunk_size) {
+void sync_dp(int *DP, int *partial_dp_local, int rank, int units_per_self, int num_procs, MPI_Request *request) {
     // maybe use async send/recv with a barrier?
-    MPI_Allgather(dp_i_recv, chunk_size, MPI_INT, DP, chunk_size, MPI_INT, MPI_COMM_WORLD);
+    switch(rank) {
+        case CAPTAIN: {
+            // if we have an upstream neighbor, then send data to it!
+            if(rank+1 < num_procs) {
+                // wait for the last MPI_Isend to complete before progressing further.
+                // MPI_Wait(request, MPI_STATUS_IGNORE);
+                // always just send data to the upstream neighbor
+                MPI_Send(partial_dp_local, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
+            }
+            break;
+        }
+        default: {
+            // if we have an upstream neighbor, then send data to it!
+            if(rank+1 < num_procs) {
+                // wait for the last MPI_Isend to complete before progressing further.
+                // MPI_Wait(request, MPI_STATUS_IGNORE);
+                // always just send data to the upstream neighbor
+                MPI_Send(partial_dp_local, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
+            }
+            // update the previous row for the next iteration with the current row
+            // receive the computed data from the downstrem neighbor in the right location of the R array
+            MPI_Recv(&DP[((rank-1)*units_per_self)], units_per_self, MPI_INT, rank-1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  
+            break;
+        }
+    }
+
+    // update the previous row with the latest computed values from this iteration
+    for(int i = 0; i < units_per_self; i++) {
+        DP[(rank*units_per_self)+i] = partial_dp_local[i];
+    }
+
+    // MPI_Wait();
+   // MPI_Allgather(partial_dp_local, chunk_size, MPI_INT, DP, chunk_size, MPI_INT, MPI_COMM_WORLD);
 }
 
 
@@ -128,13 +160,17 @@ void distribute_p(int *P, int count, int rank) {
 }
 
 
-int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self) {
+int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs) {
     // distribute the P matrix to all processes
     distribute_p(P, (len_c*(len_b+1)), rank);
 
     int m = len_a;
     int n = len_b;
     int u = len_c;
+
+    if(DEBUG > 0) {
+        printf("Loop iterations (m): %d\n", m);
+    }
 
     // these "zones" are consistent for 'm' operations
     int start_id = (rank * units_per_self);
@@ -144,6 +180,10 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
     int highest_access = -1;
     int lowest_i = -1;
     int highest_i = -1;
+
+    int result = -1;
+
+    MPI_Request request;
 
     for(int i=1; i < m+1; i++) {
         if(PROFILE > 0) {
@@ -156,10 +196,10 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
         // this variable is the solution to space optimization by only keeping
         // the last row for the next iteration of computations
         int partial_dp_local[units_per_self];
-        
+
         int t, s;
 
-        #pragma omp parallel for shared(n, i, A, B, P, DP, prev_row) private(t, s) schedule(static)
+        #pragma omp parallel for shared(n, i, A, B, P, prev_row) private(t, s) schedule(static)
         for(int j=start_id; j < end_id; j++) {
             if(j == start_id && rank == CAPTAIN) {
                 j = j+1;
@@ -214,8 +254,9 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
             }
         }
 
+        // IDEA: only distribute information to the neighboring nodes that need it
         // gather and redistribute all the calculated values of DP matrix
-        sync_dp(DP, partial_dp_local, units_per_self);
+        sync_dp(prev_row, partial_dp_local, rank, units_per_self, num_procs, &request);
 
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
@@ -225,13 +266,9 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
             }
         }
 
-        // IDEA: only distribute information to the neighboring nodes that need it
+        result = partial_dp_local[units_per_self-1];
 
-        // update the previous row for the next iteration with the current row
-        #pragma omp parallel for schedule(static)
-        for(int j=1; j < n+1; j++) {
-            prev_row[j] = DP[j];
-        }
+        // MPI_Wait(request, status);
 
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
@@ -243,6 +280,19 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
     if(DEBUG > 0) {
         printf("Rank %d === start_id %d end_id %d\n", rank, start_id, end_id);
         printf("Rank %d === lowest_access %d highest_access %d\n", rank, lowest_access, highest_access);
+        printf("COMM REQUIREMENT: Rank %d needed data from segment belonging to rank %d\n", rank, lowest_access/units_per_self);
+        printf("COMM REQUIREMENT: Rank %d needed data from segment belonging to rank %d\n", rank, highest_access/units_per_self);
     }
-    return DP[n];
+
+    int LAST_RANK = num_procs-1;
+
+    // wait on final result from last node in the linear chain
+    if(rank == LAST_RANK) {
+        MPI_Send(&result, 1, MPI_INT, CAPTAIN, TAG_FINAL_R_VALUE, MPI_COMM_WORLD);
+    }
+    if(rank == CAPTAIN) {
+        MPI_Recv(&result, 1, MPI_INT, LAST_RANK, TAG_FINAL_R_VALUE, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
+
+    return result;
 }

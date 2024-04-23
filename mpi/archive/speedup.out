@@ -1,0 +1,64 @@
+P := Rank 4 assigned 0 chunks
+DP := Rank 4 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 4 === start_id 65536 end_id 81920
+Rank 4 === lowest_access 65529 highest_access 81919
+COMM REQUIREMENT: Rank 4 needed data from segment belonging to rank 3
+COMM REQUIREMENT: Rank 4 needed data from segment belonging to rank 4
+P := Rank 2 assigned 1 chunks
+DP := Rank 2 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 2 === start_id 32768 end_id 49152
+Rank 2 === lowest_access 32757 highest_access 49151
+COMM REQUIREMENT: Rank 2 needed data from segment belonging to rank 1
+COMM REQUIREMENT: Rank 2 needed data from segment belonging to rank 2
+P := Rank 3 assigned 1 chunks
+DP := Rank 3 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 3 === start_id 49152 end_id 65536
+Rank 3 === lowest_access 49147 highest_access 65535
+COMM REQUIREMENT: Rank 3 needed data from segment belonging to rank 2
+COMM REQUIREMENT: Rank 3 needed data from segment belonging to rank 3
+P := Rank 1 assigned 1 chunks
+DP := Rank 1 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 1 === start_id 16384 end_id 32768
+Rank 1 === lowest_access 16377 highest_access 32767
+COMM REQUIREMENT: Rank 1 needed data from segment belonging to rank 0
+COMM REQUIREMENT: Rank 1 needed data from segment belonging to rank 1
+P := Rank 7 assigned 0 chunks
+DP := Rank 7 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 7 === start_id 114688 end_id 131072
+Rank 7 === lowest_access 114684 highest_access 131071
+COMM REQUIREMENT: Rank 7 needed data from segment belonging to rank 6
+COMM REQUIREMENT: Rank 7 needed data from segment belonging to rank 7
+Finally! 127963
+P := Rank 6 assigned 0 chunks
+DP := Rank 6 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 6 === start_id 98304 end_id 114688
+Rank 6 === lowest_access 98299 highest_access 114687
+COMM REQUIREMENT: Rank 6 needed data from segment belonging to rank 5
+COMM REQUIREMENT: Rank 6 needed data from segment belonging to rank 6
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 8 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+P := Rank 0 assigned 1 chunks
+DP := Rank 0 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 0 === start_id 0 end_id 16384
+Rank 0 === lowest_access -1 highest_access 16383
+COMM REQUIREMENT: Rank 0 needed data from segment belonging to rank 0
+COMM REQUIREMENT: Rank 0 needed data from segment belonging to rank 0
+lcs_yang_v2: 127963
+Execution time: 10.801264
+P := Rank 5 assigned 0 chunks
+DP := Rank 5 assigned 16384 chunks
+Loop iterations (m): 131072
+Rank 5 === start_id 81920 end_id 98304
+Rank 5 === lowest_access 81916 highest_access 98303
+COMM REQUIREMENT: Rank 5 needed data from segment belonging to rank 4
+COMM REQUIREMENT: Rank 5 needed data from segment belonging to rank 5

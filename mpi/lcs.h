@@ -22,10 +22,13 @@
 
 #define PROFILE 0
 #define USE_VERSION 1
-#define DEBUG 1
+#define DEBUG 0
 #define CAPTAIN 0
 // the iteration in the main loop when to take an execution time sample for the yang algorithm
 #define PROFILE_YANG_ITER_SAMPLE 2
+// tags for message conversations
+#define TAG_NEXT_R_SEGMENT 0
+#define TAG_FINAL_R_VALUE 1
 
 struct timespec *begin;
 struct timespec *end;
@@ -44,9 +47,9 @@ int get_index_of_character(char *str,char x, int len);
 
 void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
 
-int lcs_yang_v2(int *DP, int *prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self);
+int lcs_yang_v2(int *prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs);
 
 // additional "break-out" functions to help identify bottlenecks in application when profiling
-void sync_dp(int *DP, int *dp_i_recv, int chunk_size);
+void sync_dp(int *DP, int *dp_i_recv, int rank, int units_per_self, int num_procs, MPI_Request *request);
 
 void distribute_p(int *P, int count, int rank);
