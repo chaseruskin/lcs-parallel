@@ -95,10 +95,11 @@ int main(int argc, char *argv[]) {
         printf("DP := Rank %d assigned %d chunks\n", my_rank, chunk_size_dp);
     }
 
-    DP_Results = (int *)malloc((len_b+1) * sizeof(int));
-    dp_prev_row = (int *)malloc((len_b+1) * sizeof(int));
+    // FIXED BUG: using malloc instead of calloc introduced errors in getting results for some cases
+    DP_Results = calloc(len_b+1, sizeof(int));
+    dp_prev_row = calloc(len_b+1, sizeof(int));
 
-    P_Matrix = (int *)malloc((ROWS*(COLS)) * sizeof(int));
+    P_Matrix = calloc(ROWS*COLS, sizeof(int));
 
     begin = calloc(1, sizeof(struct timespec));
     end = calloc(1, sizeof(struct timespec));
@@ -120,7 +121,7 @@ int main(int argc, char *argv[]) {
         printf("Execution time: %lf\n", exec_time);
     }
 
-    if(DEBUG > 0) {
+    if(DEBUG > 1) {
         if(my_rank == CAPTAIN) {
             for(int i = 0; i < len_c*(len_b+1); i++) {
                 printf("%d\t", P_Matrix[i]);

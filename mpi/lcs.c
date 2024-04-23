@@ -136,11 +136,14 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
     int n = len_b;
     int u = len_c;
 
+    // these "zones" are consistent for 'm' operations
     int start_id = (rank * units_per_self);
     int end_id = (rank * units_per_self) + units_per_self;
 
     int lowest_access = start_id+end_id+1;
     int highest_access = -1;
+    int lowest_i = -1;
+    int highest_i = -1;
 
     for(int i=1; i < m+1; i++) {
         if(PROFILE > 0) {
@@ -156,13 +159,12 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
         
         int t, s;
 
-        #pragma omp parallel for shared(n, i, A, B, P, DP) private(t, s) schedule(static)
+        #pragma omp parallel for shared(n, i, A, B, P, DP, prev_row) private(t, s) schedule(static)
         for(int j=start_id; j < end_id; j++) {
             if(j == start_id && rank == CAPTAIN) {
                 j = j+1;
             }
             /* VERSION 1 (branching implementation) */
-            // NOTE: may not be working correctly? see test on 1.txt
             if(USE_VERSION == 1) {
                 if(A[i-1] == B[j-1]) {
                     partial_dp_local[j-start_id] = prev_row[j-1] + 1;
@@ -177,7 +179,6 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
                     // printf("Rank %d iteration i = %d j = %d: prev_row accesses %d %d %d\n", rank, i, j, j-1, j, P[(c_i*(n+1))+j]-1);
                 }
             /* VERSION 2 (no branching implementation) */
-            // NOTE: sometimes neither of them work!...
             } else {
                 t = (0-P[(c_i*(n+1))+j]) < 0;
                 s = (0 - (prev_row[j] - (t*prev_row[P[(c_i*(n+1))+j]-1]) ));
@@ -212,8 +213,10 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
                 *begin = now();
             }
         }
+
         // gather and redistribute all the calculated values of DP matrix
         sync_dp(DP, partial_dp_local, units_per_self);
+
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
                 double exec_time = tdiff(*begin, now());
@@ -222,11 +225,14 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
             }
         }
 
+        // IDEA: only distribute information to the neighboring nodes that need it
+
         // update the previous row for the next iteration with the current row
         #pragma omp parallel for schedule(static)
         for(int j=1; j < n+1; j++) {
             prev_row[j] = DP[j];
         }
+
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
                 double exec_time = tdiff(*begin, now());
@@ -235,8 +241,8 @@ int lcs_yang_v2(int *DP, int *prev_row, int *P, char *A, char *B, char *C, int l
         }
     }
     if(DEBUG > 0) {
-        printf("Rank %d start_id %d end_id %d\n", rank, start_id, end_id);
-        printf("Rank %d lowest_access %d highest_access %d\n", rank, lowest_access, highest_access);
+        printf("Rank %d === start_id %d end_id %d\n", rank, start_id, end_id);
+        printf("Rank %d === lowest_access %d highest_access %d\n", rank, lowest_access, highest_access);
     }
     return DP[n];
 }

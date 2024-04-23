@@ -51,7 +51,9 @@ chunk_dp: 16384 procs: 8
 lcs_yang_v2 is: 127963
 Time taken for lcs_yang_v2 is: 28.240098
 
-
+# another run
+lcs_yang_v2: 127963
+Execution time: 26.568065
 
 
 
