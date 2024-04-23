@@ -20,9 +20,9 @@
 char *A_str;
 char *B_str;
 char *C_ustr; 
-int *P_Matrix;
+int *P_matrix;
 // int *DP_Results;
-int *dp_prev_row;
+int *R_prev_row;
 
 
 int main(int argc, char *argv[]) {
@@ -31,8 +31,6 @@ int main(int argc, char *argv[]) {
 
     int my_rank;
     int num_procs;
-    int chunk_size_dp; 
-    int result;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
@@ -88,19 +86,19 @@ int main(int argc, char *argv[]) {
     }
     
     // partition the number of units among all processes evenly
-    chunk_size_dp = get_computation_size(len_b+1, my_rank, num_procs);
+    int units_per_self = get_computation_size(len_b+1, my_rank, num_procs);
 
     if(DEBUG > 0) {
         printf("P := Rank %d assigned %d chunks\n", my_rank, get_computation_size(len_c, my_rank, num_procs));
-        printf("DP := Rank %d assigned %d chunks\n", my_rank, chunk_size_dp);
+        printf("DP := Rank %d assigned %d chunks\n", my_rank, units_per_self);
     }
 
     // FIXED BUG: using malloc instead of calloc introduced errors in getting results for some cases
     // ENHANCEMENT: Saved space by not required this array at all
     // DP_Results = calloc(len_b+1, sizeof(int));
-    dp_prev_row = calloc(len_b+1, sizeof(int));
+    R_prev_row = calloc(len_b+1, sizeof(int));
 
-    P_Matrix = calloc(ROWS*COLS, sizeof(int));
+    P_matrix = calloc(ROWS*COLS, sizeof(int));
 
     begin = calloc(1, sizeof(struct timespec));
     end = calloc(1, sizeof(struct timespec));
@@ -108,9 +106,9 @@ int main(int argc, char *argv[]) {
     // start timing immediately before distributing data
     *begin = now();
 
-    calc_P_matrix_v2(P_Matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
+    calc_P_matrix_v2(P_matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
 
-    result = lcs_yang_v2(dp_prev_row, P_Matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, chunk_size_dp, num_procs);
+    int result = lcs_yang_v2(R_prev_row, P_matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, units_per_self, num_procs);
     
     // halt the timing
     *end = now();
@@ -124,10 +122,11 @@ int main(int argc, char *argv[]) {
 
     if(DEBUG > 1) {
         if(my_rank == CAPTAIN) {
+            printf("P MATRIX\n");
             for(int i = 0; i < len_c*(len_b+1); i++) {
-                printf("%d\t", P_Matrix[i]);
+                printf("%d\t", P_matrix[i]);
             }
-            printf("\n");
+            printf("END P MATRIX\n");
         }
     }
 
@@ -136,8 +135,8 @@ int main(int argc, char *argv[]) {
     free(B_str);
     free(C_ustr);
     
-    free(dp_prev_row);
-    free(P_Matrix);
+    free(R_prev_row);
+    free(P_matrix);
     // free(DP_Results);
 
     free(begin);

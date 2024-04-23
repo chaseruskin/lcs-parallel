@@ -125,6 +125,59 @@ lcs_yang_v2: 127963
 Execution time: 23.648409
 
 
+# AFTER LATEST IMPROVEMENTS!!!... But answer is wrong, (probably requires results from previous two neighbors)
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127967
+Execution time: 2.895374
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127967
+Execution time: 2.899055
+
+
+# FIXED BUG, must initialize starting value in prev_row to 0 to get consistent computation... 
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 4.699914
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 4.946449
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 5.454106
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 5.120203
+
 # example profile using custom profiling (for fine granularity)
 
 Rank 7 P matrix mpi broadcast time: 0.089014
@@ -337,3 +390,115 @@ length of string B: 131071
 string C is: ATCG
 lcs_yang_v2 is: 127963
 total time taken: 3.916268
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 25.774430
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 9.858412
+
+
+
+# BATTLE AGAINST OMP (plus using -O2 flag) WITH HYBRID
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 16 processes (2 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 4.252014
+
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 2.483861
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 2.905632
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 2.257817
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 2.238489
+
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 2.123601
+
+
+
+
+# increasing SW threads (only 1 HW thread) is bad
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (16 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 127963
+Execution time: 44.896676
+
+
+
+# on comparison to our original benchmarks
+
+# SERIAL FOR REFERENCE
+
+Your input file: /home/c.ruskin/eel6763/project/data/9.txt 
+Sequence lengths : 32768 32767 4
+Length of LCS is: 9793
+Time taken by sequential algorithm is: 6.271012 seconds
+
+# USING NEW CODE
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/9.txt" on each of 32 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 32767 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 9793
+Execution time: 0.248656
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/9.txt" on each of 32 processes (1 threads per rank)...
+Branching: enabled (version 1)
+Length of string B: 32767 
+Length of string C: 4
+String C is: ATCG
+lcs_yang_v2: 9793
+Execution time: 0.243861

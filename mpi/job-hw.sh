@@ -22,12 +22,12 @@
 #SBATCH --mail-user=c.ruskin@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
-#SBATCH --nodes=8
-#SBATCH --ntasks=8
+#SBATCH --nodes=32
+#SBATCH --ntasks=32
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
 #SBATCH --sockets-per-node=1
-#SBATCH --mem-per-cpu=1000mb
+#SBATCH --mem-per-cpu=2000mb
 #SBATCH -t 00:05:00
 #SBATCH --cpus-per-task=1
 export OMP_NUM_THREADS=1

@@ -110,7 +110,7 @@ void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int
 }
 
 
-void sync_dp(int *DP, int *partial_dp_local, int rank, int units_per_self, int num_procs, MPI_Request *request) {
+void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int num_procs, MPI_Request *request) {
     // maybe use async send/recv with a barrier?
     switch(rank) {
         case CAPTAIN: {
@@ -119,7 +119,7 @@ void sync_dp(int *DP, int *partial_dp_local, int rank, int units_per_self, int n
                 // wait for the last MPI_Isend to complete before progressing further.
                 // MPI_Wait(request, MPI_STATUS_IGNORE);
                 // always just send data to the upstream neighbor
-                MPI_Send(partial_dp_local, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
+                MPI_Send(R_part_row, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
             }
             break;
         }
@@ -129,22 +129,20 @@ void sync_dp(int *DP, int *partial_dp_local, int rank, int units_per_self, int n
                 // wait for the last MPI_Isend to complete before progressing further.
                 // MPI_Wait(request, MPI_STATUS_IGNORE);
                 // always just send data to the upstream neighbor
-                MPI_Send(partial_dp_local, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
+                MPI_Send(R_part_row, units_per_self, MPI_INT, rank+1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD);
             }
             // update the previous row for the next iteration with the current row
             // receive the computed data from the downstrem neighbor in the right location of the R array
-            MPI_Recv(&DP[((rank-1)*units_per_self)], units_per_self, MPI_INT, rank-1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  
+            MPI_Recv(&R_prev_row[((rank-1)*units_per_self)], units_per_self, MPI_INT, rank-1, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);  
             break;
         }
     }
 
     // update the previous row with the latest computed values from this iteration
+    #pragma omp parallel for shared(R_part_row) schedule(static)
     for(int i = 0; i < units_per_self; i++) {
-        DP[(rank*units_per_self)+i] = partial_dp_local[i];
+        R_prev_row[(rank*units_per_self)+i] = R_part_row[i];
     }
-
-    // MPI_Wait();
-   // MPI_Allgather(partial_dp_local, chunk_size, MPI_INT, DP, chunk_size, MPI_INT, MPI_COMM_WORLD);
 }
 
 
@@ -160,7 +158,7 @@ void distribute_p(int *P, int count, int rank) {
 }
 
 
-int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs) {
+int lcs_yang_v2(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs) {
     // distribute the P matrix to all processes
     distribute_p(P, (len_c*(len_b+1)), rank);
 
@@ -195,11 +193,12 @@ int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int
         int c_i = get_index_of_character(C, A[i-1], u);
         // this variable is the solution to space optimization by only keeping
         // the last row for the next iteration of computations
-        int partial_dp_local[units_per_self];
+        int R_part_row[units_per_self];
+        R_part_row[0] = 0;
 
-        int t, s;
+        int t, s, access;
 
-        #pragma omp parallel for shared(n, i, A, B, P, prev_row) private(t, s) schedule(static)
+        #pragma omp parallel for shared(n, c_i, i, A, B, P, R_prev_row) private(t, s, access) schedule(static)
         for(int j=start_id; j < end_id; j++) {
             if(j == start_id && rank == CAPTAIN) {
                 j = j+1;
@@ -207,22 +206,31 @@ int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int
             /* VERSION 1 (branching implementation) */
             if(USE_VERSION == 1) {
                 if(A[i-1] == B[j-1]) {
-                    partial_dp_local[j-start_id] = prev_row[j-1] + 1;
+                    R_part_row[j-start_id] = R_prev_row[j-1] + 1;
+                    if((j-1)/units_per_self < rank-1) {
+                        printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (j-1)/units_per_self);
+                        MPI_Abort(MPI_COMM_WORLD, 101);
+                    }
                 }
                 else if(P[(c_i*(n+1))+j] == 0) {
-                    partial_dp_local[j-start_id] = max(prev_row[j], 0);
+                    R_part_row[j-start_id] = max(R_prev_row[j], 0);
+                    if(j/units_per_self < rank-1) {
+                        printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, j/units_per_self);
+                        MPI_Abort(MPI_COMM_WORLD, 102);
+                    }
                 }
                 else {
-                    partial_dp_local[j-start_id] = max(prev_row[j], prev_row[P[(c_i*(n+1))+j]-1] + 1);
-                }
-                if(DEBUG > 0) {
-                    // printf("Rank %d iteration i = %d j = %d: prev_row accesses %d %d %d\n", rank, i, j, j-1, j, P[(c_i*(n+1))+j]-1);
+                    R_part_row[j-start_id] = max(R_prev_row[j], R_prev_row[P[(c_i*(n+1))+j]-1] + 1);
+                    if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-1) {
+                        printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
+                        MPI_Abort(MPI_COMM_WORLD, 103);
+                    }
                 }
             /* VERSION 2 (no branching implementation) */
             } else {
                 t = (0-P[(c_i*(n+1))+j]) < 0;
-                s = (0 - (prev_row[j] - (t*prev_row[P[(c_i*(n+1))+j]-1]) ));
-                partial_dp_local[j-start_id] = ((t^1)||(s^0))*(prev_row[j]) + (!((t^1)||(s^0)))*(prev_row[P[(c_i*(n+1))+j]-1] + 1);
+                s = (0 - (R_prev_row[j] - (t*R_prev_row[P[(c_i*(n+1))+j]-1]) ));
+                R_part_row[j-start_id] = ((t^1)||(s^0))*(R_prev_row[j]) + (!((t^1)||(s^0)))*(R_prev_row[P[(c_i*(n+1))+j]-1] + 1);
             }
             if(DEBUG > 0) {
                 if(highest_access < j-1) {
@@ -256,7 +264,7 @@ int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int
 
         // IDEA: only distribute information to the neighboring nodes that need it
         // gather and redistribute all the calculated values of DP matrix
-        sync_dp(prev_row, partial_dp_local, rank, units_per_self, num_procs, &request);
+        sync_r(R_prev_row, R_part_row, rank, units_per_self, num_procs, &request);
 
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
@@ -266,7 +274,7 @@ int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int
             }
         }
 
-        result = partial_dp_local[units_per_self-1];
+        result = R_prev_row[n];
 
         // MPI_Wait(request, status);
 
@@ -288,6 +296,14 @@ int lcs_yang_v2(int *prev_row, int *P, char *A, char *B, char *C, int len_a, int
 
     // wait on final result from last node in the linear chain
     if(rank == LAST_RANK) {
+        if(DEBUG > 1) {
+            printf("LAST RANK R MATRIX:\n");
+            for(int i = 0; i < len_b+1; i++) {
+                printf("%d\t", R_prev_row[i]);
+            }
+            printf("END LAST RANK R MATRIX\n");
+        }
+
         MPI_Send(&result, 1, MPI_INT, CAPTAIN, TAG_FINAL_R_VALUE, MPI_COMM_WORLD);
     }
     if(rank == CAPTAIN) {
