@@ -87,19 +87,41 @@ int main(int argc, char *argv[]) {
         printf("String C is: %s\n", C_ustr);
     }
     
-    // partition the number of units among all processes evenly
-    int units_per_self = get_computation_size(len_b+1, my_rank, num_procs);
+    // partition the number of units among all processes as evenly as possible
+    int units_per_rank[num_procs];
+    for(int i = 0; i < num_procs; i++) {
+        units_per_rank[i] = get_computation_size(len_b+1, i, num_procs);
+    }
+    int units_per_self = units_per_rank[my_rank];
 
-    if(DEBUG > 0) {
-        printf("P := Rank %d assigned %d chunks\n", my_rank, get_computation_size(len_c, my_rank, num_procs));
-        printf("DP := Rank %d assigned %d chunks\n", my_rank, units_per_self);
+    // compute array for the displacements for each rank
+    int displ_per_rank[num_procs];
+    displ_per_rank[0] = 0;
+    for(int i = 1; i < num_procs; i++) {
+        displ_per_rank[i] = displ_per_rank[i-1] + units_per_rank[i-1];
     }
 
     // FIXED BUG: using malloc instead of calloc introduced errors in getting results for some cases
     // ENHANCEMENT: Saved space by not required this array at all
     // DP_Results = calloc(len_b+1, sizeof(int));
     // MORE SPACE OPT: only store NEIGHBOR_DIST neighbors of work required (including self)!
-    R_prev_row = calloc(((NEIGHBOR_DIST+1)*units_per_self), sizeof(int));
+    int len_r_prev_row_size = units_per_rank[my_rank];
+    for(int i = 0; i < NEIGHBOR_DIST; i++) {
+        len_r_prev_row_size += units_per_rank[my_rank-i-1];
+    }
+
+    if(DEBUG > 0) {
+        printf("P := Rank %d assigned %d chunks\n", my_rank, get_computation_size(len_c, my_rank, num_procs));
+        printf("DP := Rank %d assigned %d chunks\n", my_rank, units_per_self);
+
+        printf("displ_per_rank[%d] = %d\n", my_rank, displ_per_rank[my_rank]);
+        printf("units_per_rank[%d] = %d\n", my_rank, units_per_rank[my_rank]);
+        printf("Rank %d has len of R previous row: %d\n", my_rank, len_r_prev_row_size);
+    }
+
+    // MPI_Finalize();
+
+    R_prev_row = calloc(len_r_prev_row_size, sizeof(int));
 
     P_matrix = calloc(ROWS*COLS, sizeof(int));
 
@@ -109,10 +131,10 @@ int main(int argc, char *argv[]) {
     // start timing immediately before distributing data
     *begin = now();
 
-    calc_P_matrix_v2(P_matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
+    calc_P_matrix(P_matrix, B_str, len_b, C_ustr, len_c, my_rank, num_procs);
 
-    int result = lcs_yang(R_prev_row, P_matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, units_per_self, num_procs);
-    
+    int result = lcs_yang(R_prev_row, P_matrix, A_str, B_str, C_ustr, len_a, len_b, len_c, my_rank, units_per_rank, displ_per_rank, num_procs, len_r_prev_row_size);
+
     // halt the timing
     *end = now();
 
@@ -123,7 +145,7 @@ int main(int argc, char *argv[]) {
         printf("Execution time: %lf\n", exec_time);
     }
 
-    if(DEBUG > 1) {
+    if(DEBUG > 2) {
         if(my_rank == CAPTAIN) {
             printf("P MATRIX\n");
             for(int i = 0; i < len_c*(len_b+1); i++) {

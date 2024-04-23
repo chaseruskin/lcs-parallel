@@ -25,12 +25,12 @@
 
 // various options for debugging and profiling with various implementations
 #define PROFILE 0
-#define DEBUG 1
+#define DEBUG 0
 // the iteration in the main loop when to take an execution time sample for the yang algorithm
 #define PROFILE_YANG_ITER_SAMPLE 2
 
 // the version of the yang algorithm to use (1: BRANCHING, 2: NO BRANCHING)
-#define USE_VERSION 1
+#define USE_VERSION 2
 // root rank/process ID
 #define CAPTAIN 0
 // tags for message conversations
@@ -52,11 +52,11 @@ int get_computation_size(int N, int rank, int size);
 
 int get_index_of_character(char *str,char x, int len);
 
-void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
+void calc_P_matrix(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks);
 
-int lcs_yang(int *R_prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs);
+int lcs_yang(int *R_prev_row,  int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int *units_per_rank, int *displ_per_rank, int num_procs, int len_r_prev_row_size);
 
 // additional "break-out" functions to help identify bottlenecks in application when profiling
-void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int num_procs, MPI_Request *request);
+void sync_r(int *R_prev_row, int *R_part_row, int rank, int *units_per_rank, int *displ_per_rank, int num_procs, int offset, MPI_Request *request);
 
 void distribute_p(int *P, int count, int rank);

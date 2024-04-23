@@ -47,7 +47,7 @@ int get_index_of_character(char *str, char x, int len) {
 }
 
 
-void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks) {
+void calc_P_matrix(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks) {
 
     if(PROFILE > 0) {
         *begin = now();
@@ -110,7 +110,9 @@ void calc_P_matrix_v2(int *p_global, char *b, int len_b, char *c, int len_c, int
 }
 
 
-void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int num_procs, MPI_Request *request) {
+void sync_r(int *R_prev_row, int *R_part_row, int rank, int *units_per_rank, int *displ_per_rank, int num_procs, int offset, MPI_Request *request) {
+
+    int units_per_self = units_per_rank[rank];
     // maybe use async send/recv with a barrier?
     switch(rank) {
         case CAPTAIN: {
@@ -143,16 +145,16 @@ void sync_r(int *R_prev_row, int *R_part_row, int rank, int units_per_self, int 
                     break;
                 }
                 // receive the computed data from the downstrem neighbor in the right location of the R array
-                MPI_Recv(&R_prev_row[(NEIGHBOR_DIST-1-i)*units_per_self], units_per_self, MPI_INT, rank-1-i, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Recv(&R_prev_row[displ_per_rank[rank-1-i]-offset], units_per_rank[rank-1-i], MPI_INT, rank-1-i, TAG_NEXT_R_SEGMENT, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             }
             break;
         }
     }
 
     // update the previous row with the latest computed values from this iteration
-    #pragma omp parallel for shared(R_part_row) schedule(static)
+    #pragma omp parallel for shared(R_part_row, displ_per_rank, rank, offset) schedule(static)
     for(int i = 0; i < units_per_self; i++) {
-        R_prev_row[(NEIGHBOR_DIST*units_per_self)+i] = R_part_row[i];
+        R_prev_row[displ_per_rank[rank]-offset+i] = R_part_row[i];
     }
 }
 
@@ -169,7 +171,7 @@ void distribute_p(int *P, int count, int rank) {
 }
 
 
-int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int units_per_self, int num_procs) {
+int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int len_b, int len_c, int rank, int *units_per_rank, int *displ_per_rank, int num_procs, int len_r_prev_row_size) {
     // distribute the P matrix to all processes
     distribute_p(P, (len_c*(len_b+1)), rank);
 
@@ -181,9 +183,19 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
         printf("Loop iterations (m): %d\n", m);
     }
 
+    int units_per_self = units_per_rank[rank];
+
     // these "zones" are consistent for 'm' operations
-    int start_id = (rank * units_per_self);
-    int end_id = (rank * units_per_self) + units_per_self;
+    int start_id = 0;
+    int offset = 0;
+    for(int i = 0; i < rank; i++) {
+        start_id += units_per_rank[i];
+        if(i < rank-NEIGHBOR_DIST) {
+            offset += units_per_rank[i];
+        }
+    }
+    // include the number of work units for this particular rank
+    int end_id = start_id + units_per_rank[rank];
 
     int lowest_access = start_id+end_id+1;
     int highest_access = -1;
@@ -193,15 +205,14 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
     int result = -1;
 
     // difference to align with partial R previous row for space optimization
-    int offset = ((rank-NEIGHBOR_DIST) * units_per_self);
-    if(rank-NEIGHBOR_DIST < 0) {
-        offset = 0;
-    }
     if(DEBUG > 0) {
         printf("Rank %d aligning data in R previous row with offset %d\n", rank, offset);
     }
 
     MPI_Request request;
+
+    // this variable is the solution to space optimization by only keeping the last row for the next iteration of computations
+    int R_part_row[units_per_self];
 
     for(int i=1; i < m+1; i++) {
         if(PROFILE > 0) {
@@ -211,15 +222,14 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
             }
         }
         int c_i = get_index_of_character(C, A[i-1], u);
-        // this variable is the solution to space optimization by only keeping
-        // the last row for the next iteration of computations
-        int R_part_row[units_per_self];
-        R_part_row[0] = 0;
+
+        // reset the partial R row array for this iteration on this particular rank
+        memset(&R_part_row, 0, units_per_self);
 
         int t, s, access;
 
         #pragma omp parallel for shared(n, c_i, i, A, B, P, R_prev_row) private(t, s, access) schedule(static)
-        for(int j=start_id; j < end_id; j++) {
+        for(int j = start_id; j < end_id; j++) {
             if(j == start_id && rank == CAPTAIN) {
                 j = j+1;
             }
@@ -227,6 +237,7 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
             if(USE_VERSION == 1) {
                 if(A[i-1] == B[j-1]) {
                     R_part_row[j-start_id] = R_prev_row[j-1-offset] + 1;
+                    // NOTE: these checks will need to be updated for uneven partition checking
                     if((j-1)/units_per_self < rank-NEIGHBOR_DIST) {
                         printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (j-1)/units_per_self);
                         fflush(stdout);
@@ -235,6 +246,7 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
                 }
                 else if(P[(c_i*(n+1))+j] == 0) {
                     R_part_row[j-start_id] = max(R_prev_row[j-offset], 0);
+
                     if(P[(c_i*(n+1))+j]/units_per_self < rank-NEIGHBOR_DIST) {
                         printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, j/units_per_self);
                         fflush(stdout);
@@ -243,6 +255,7 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
                 }
                 else {
                     R_part_row[j-start_id] = max(R_prev_row[j-offset], R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
+                    
                     if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-NEIGHBOR_DIST) {
                         printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
                         fflush(stdout);
@@ -252,8 +265,8 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
             /* VERSION 2 (no branching implementation) */
             } else {
                 t = (0-P[(c_i*(n+1))+j]) < 0;
-                s = (0 - (R_prev_row[j] - (t*R_prev_row[P[(c_i*(n+1))+j]-1]) ));
-                R_part_row[j-start_id] = ((t^1)||(s^0))*(R_prev_row[j]) + (!((t^1)||(s^0)))*(R_prev_row[P[(c_i*(n+1))+j]-1] + 1);
+                s = (0 - (R_prev_row[j-offset] - (t*R_prev_row[P[(c_i*(n+1))+j]-1-offset]) ));
+                R_part_row[j-start_id] = ((t^1)||(s^0))*(R_prev_row[j-offset]) + (!((t^1)||(s^0)))*(R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
                 
                 if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-NEIGHBOR_DIST) {
                     printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
@@ -292,8 +305,8 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
         }
 
         // IDEA: only distribute information to the neighboring nodes that need it
-        // gather and redistribute all the calculated values of DP matrix
-        sync_r(R_prev_row, R_part_row, rank, units_per_self, num_procs, &request);
+        // gather and redistribute all the calculated values of DP matrix -> done!
+        sync_r(R_prev_row, R_part_row, rank, units_per_rank, displ_per_rank, num_procs, offset, &request);
 
         if(PROFILE > 0) {
             if(i == PROFILE_YANG_ITER_SAMPLE) {
@@ -303,7 +316,7 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
             }
         }
 
-        result = R_prev_row[((NEIGHBOR_DIST+1)*units_per_self)-1];
+        result = R_prev_row[len_r_prev_row_size-1];
 
         // MPI_Wait(request, status);
 
@@ -327,7 +340,7 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
     if(rank == LAST_RANK) {
         if(DEBUG > 1) {
             printf("LAST RANK R MATRIX:\n");
-            for(int i = 0; i < (NEIGHBOR_DIST+1)*units_per_self; i++) {
+            for(int i = 0; i < len_r_prev_row_size; i++) {
                 printf("%d\t", R_prev_row[i]);
             }
             printf("\nEND LAST RANK R MATRIX\n");

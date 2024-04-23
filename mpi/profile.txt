@@ -517,3 +517,74 @@ Execution time: 0.243861
     neighbor distance
 
   - still bug with offset not working on rank 0 for 3.txt???
+
+  - fixed bug (actually not a bug, just not understanding my implmentation)
+
+
+# UNDER 2 SECONDS!! after space optimizations... (can tone back down job-hw to 1000mb per cpu? -> Yes!)
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+LCS: 127963
+Execution time: 1.872499
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+LCS: 127963
+Execution time: 1.874117
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+LCS: 127963
+Execution time: 1.941344
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/11.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 131071 
+Length of string C: 4
+String C is: ATCG
+LCS: 127963
+Execution time: 1.884260
+
+
+
+
+# MORE OPTS?
+
+- try asynchronous send and receives? MPI_Isend MPI_Irecv
+
+- need more robust program: not all work (see r9.txt w/ 32 or r4.txt w/ 8) can be divided up evenly among all nodes
+  approach: have each node keep track of space each neighbor is allocated to work on
+
+
+
+# Improve robustness work:
+# IDEAL for r4 (serial)
+
+Your input file: /home/c.ruskin/eel6763/project/data/r4.txt 
+Sequence lengths : 9588 9585 4
+Length of LCS is: 6740
+Time taken by sequential algorithm is: 0.598074 seconds
+
+
+# FROM MPI 
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/r4.txt" on each of 4 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 9585 
+Length of string C: 4
+String C is: ATCG
+LCS: 6740
+Execution time: 0.180569
+
+
+# robustness now implemented!
