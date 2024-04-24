@@ -237,39 +237,27 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
             if(USE_VERSION == 1) {
                 if(A[i-1] == B[j-1]) {
                     R_part_row[j-start_id] = R_prev_row[j-1-offset] + 1;
-                    // NOTE: these checks will need to be updated for uneven partition checking
-                    if((j-1)/units_per_self < rank-NEIGHBOR_DIST) {
-                        printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (j-1)/units_per_self);
-                        fflush(stdout);
-                        MPI_Abort(MPI_COMM_WORLD, 101);
-                    }
                 }
                 else if(P[(c_i*(n+1))+j] == 0) {
                     R_part_row[j-start_id] = max(R_prev_row[j-offset], 0);
-
-                    if(P[(c_i*(n+1))+j]/units_per_self < rank-NEIGHBOR_DIST) {
-                        printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, j/units_per_self);
-                        fflush(stdout);
-                        MPI_Abort(MPI_COMM_WORLD, 102);
-                    }
                 }
                 else {
                     R_part_row[j-start_id] = max(R_prev_row[j-offset], R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
-                    
-                    if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-NEIGHBOR_DIST) {
-                        printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
-                        fflush(stdout);
-                        MPI_Abort(MPI_COMM_WORLD, 103);
-                    }
+                }
+                // provide a level of error-handling
+                if(rank-NEIGHBOR_DIST >= 0 && P[(c_i*(n+1))+j]-1 < displ_per_rank[rank-NEIGHBOR_DIST]) {
+                    printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, rank-NEIGHBOR_DIST);
+                    fflush(stdout);
+                    MPI_Abort(MPI_COMM_WORLD, 103);
                 }
             /* VERSION 2 (no branching implementation) */
             } else {
                 t = (0-P[(c_i*(n+1))+j]) < 0;
                 s = (0 - (R_prev_row[j-offset] - (t*R_prev_row[P[(c_i*(n+1))+j]-1-offset]) ));
                 R_part_row[j-start_id] = ((t^1)||(s^0))*(R_prev_row[j-offset]) + (!((t^1)||(s^0)))*(R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
-                
-                if((P[(c_i*(n+1))+j]-1)/units_per_self < rank-NEIGHBOR_DIST) {
-                    printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, (P[(c_i*(n+1))+j]-1)/units_per_self);
+                // provide a level of error-handling
+                if(rank-NEIGHBOR_DIST >= 0 && P[(c_i*(n+1))+j]-1 < displ_per_rank[rank-NEIGHBOR_DIST]) {
+                    printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, rank-NEIGHBOR_DIST);
                     fflush(stdout);
                     MPI_Abort(MPI_COMM_WORLD, 103);
                 }

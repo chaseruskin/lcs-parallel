@@ -114,6 +114,96 @@ The graphical results of our experimental porting of the application to the HiPe
 
 We proceeded with using the MPI version of the code to identify potential bottlenecks in increasingly large data sets. We used `gprof` to measure the time for each function.
 
+Using `gprof` did not reveal much information because the application is fairly linear in its process to distribute work and begin computing the tasks in parallel for yang's LCS algorithm. Even breaking the steps of the algorithm into separate functions, `gprof` was not able to identify enough samples to calculate timings in the different regions of code.
+
+![](./images/lcs-mpi-profile.png)
+
+To try to gain more insight, we implemented custom profiling throughout the stages by using a timing function for the wall time and enabling a configuration variable `#define PROFILE 1`. Our analysis of the application identified the algorithm running `m` iterations independently on the allocated ranks, with a large amount of communication occurring between ranks during each iteration to synchronize the partially computed R matrix across all ranks for the next iteration. Each rank depended upon values computed in the previous iteration, but never values in the current row (hence, Yang's algorithm is called row-wise independent).
+
+![](./images/mpi-comm.png)
+
+In the original approach, the program used `MPI_Allgather(...)` to distribute the computed section of each rank to all other ranks and then collect the computed sections of all other ranks to maintain the previous R matrix row as the `m` iterations progress.
+
+# 4. Optimizations and Improvements
+
+Analyzing the available workloads, we identified a pattern: for a given iteration, a rank's dependencies can be limited to only requiring its previously computed section from the last iteration and its left neighbor's section from the last iteration. We call this the _neighbor distance_ of a rank, and it can be configured using the compile-time variable `#define NEIGHBOR_DIST 1`. Additional logic is implemented to check and exit early during computation if a rank requires data from a neighbor that is further away than the configured amount. However, given a very large `n` and a limited number `c` of ranks (maximum: 32), it is common for a rank to only require the data of the immediate neighbor that is 1 allocation away from the current rank.
+
+With this new approach, the communication among ranks is greatly reduced by only speaking between neighbors to the left and right using `MPI_Send(...)` and `MPI_Recv(...)` up to neighbors that are `NEIGHBOR_DIST` away from the current rank. This reduced communication time is seen on every of the `m` iterations.
+
+Because only partial entries of the previous R matrix is needed for each rank, then we can also optimize the space required for a given rank by limiting to only the total number of entries stored for the current ranks's distribution of work as well as its neighbor's distribution of work. No longer is the entire R matrix of size `n` needing to be communicated and maintained across ranks, only the necessary partial sections.
+
+![](./images/mpi-linear-comm.png)
+
+The result for the LCS algorithm is computed in rank `c` in the final entry of the last iteration `m`. This result is then sent to the root rank (rank 0) to synchronize the result with the main process.
+
+With the new improvements to minimized communication cost, we can scale the number of ranks without introducing significant additional communication costs per rank. Therefore, we found the ideal resource configuration to be the maximum allowed ranks: 32. We suspect improvements in execution time to continue for larger size of ranks due to the nature of the communication between only local ranks.
+
+### Miscellaneous
+
+There were numerous other bugs and small code modifications implemented to improve the program.
+
+## Results and Analysis
+
+We further took our improved MPI version and ran it on even larger inputs.
+
+### `simulated/11.txt`
+
+We tested our improvements against the original MPI implementation using the suggest resource configuration using a dataset (Length A = 131072, Length B = 131071, Length C = 4).
+
+Original MPI: 
+```
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 50.016128
+```
+
+Original OpenMP:
+```
+lcs_yang_v2 is: 127963
+total time taken: 3.916268
+```
+
+Improved MPI: 
+```
+LCS: 127963
+Execution time: 1.884260
+```
+
+For this input, the calculated speedup is roughly 26.6x faster than the original implementation. 
+
+### `real/9.txt`
+
+For real data `9.txt`, the original work's best implementation (OpenMP) took roughly 1 hour according to the graph. The original MPI version took over 7 days to complete. Our improved MPI version had the following result:  
+
+Improved MPI:
+```
+Loading DNA file "/home/c.ruskin/eel6763/project/data/r9.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 3078061 
+Length of string C: 4
+String C is: ATCG
+LCS: 1274453
+Execution time: 840.397835
+```
+
+For this input, the calculated speedup is roughly 4.28x faster than the best original implementation.
+
+### `real/10.txt`
+
+For real data `10.txt`, the original work's best implementation (OpenMP) took roughly 10 hours according to the graph. The original MPI version took over 7 days to complete. Our improved MPI version had the following result:  
+
+Improved MPI:
+```
+Loading DNA file "/home/c.ruskin/eel6763/project/data/r10.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 16199981 
+Length of string C: 4
+String C is: ATCG
+LCS: 1505370
+Execution time: 3966.671467
+```
+
+For this input, the calculated speedup is roughly 9.00x faster than the best original implementation.
+
 # References
 
 [1] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6458724/  

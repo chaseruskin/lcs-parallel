@@ -588,3 +588,28 @@ Execution time: 0.180569
 
 
 # robustness now implemented!
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/r8.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 32133 
+Length of string C: 4
+String C is: ATCG
+LCS: 21078
+Execution time: 0.198537
+
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/r9.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 3078061 
+Length of string C: 4
+String C is: ATCG
+LCS: 1274453
+Execution time: 840.397835
+
+Loading DNA file "/home/c.ruskin/eel6763/project/data/r10.txt" on each of 32 processes (1 threads per rank)...
+Branching: disabled (version 2)
+Length of string B: 16199981 
+Length of string C: 4
+String C is: ATCG
+LCS: 1505370
+Execution time: 3966.671467

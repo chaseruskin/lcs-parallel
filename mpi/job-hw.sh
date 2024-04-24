@@ -28,11 +28,11 @@
 #SBATCH --ntasks-per-socket=1
 #SBATCH --sockets-per-node=1
 #SBATCH --mem-per-cpu=1000mb
-#SBATCH -t 00:05:00
+#SBATCH -t 04:00:00
 #SBATCH --cpus-per-task=1
 export OMP_NUM_THREADS=1
 
-DATA_FILE="r9"
+DATA_FILE="r10"
 
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
 # INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"

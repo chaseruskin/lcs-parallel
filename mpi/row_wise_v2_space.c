@@ -119,8 +119,6 @@ int main(int argc, char *argv[]) {
         printf("Rank %d has len of R previous row: %d\n", my_rank, len_r_prev_row_size);
     }
 
-    // MPI_Finalize();
-
     R_prev_row = calloc(len_r_prev_row_size, sizeof(int));
 
     P_matrix = calloc(ROWS*COLS, sizeof(int));
