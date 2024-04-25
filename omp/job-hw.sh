@@ -27,8 +27,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=1000mb
 #SBATCH -t 00:05:00
-#SBATCH --cpus-per-task=16
-export OMP_NUM_THREADS=16
+#SBATCH --cpus-per-task=32
+export OMP_NUM_THREADS=32
 
 DATA_FILE="11"
 INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"

@@ -22,8 +22,8 @@
 #SBATCH --mail-user=c.ruskin@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
-#SBATCH --nodes=4
-#SBATCH --ntasks=4
+#SBATCH --nodes=16
+#SBATCH --ntasks=16
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
 #SBATCH --sockets-per-node=1

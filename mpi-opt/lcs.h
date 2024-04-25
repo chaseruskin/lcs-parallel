@@ -24,7 +24,7 @@
 #define NEIGHBOR_DIST 1
 
 // various options for debugging and profiling with various implementations
-#define PROFILE 0
+#define PROFILE 1
 #define DEBUG 0
 // the iteration in the main loop when to take an execution time sample for the yang algorithm
 #define PROFILE_YANG_ITER_SAMPLE 2
