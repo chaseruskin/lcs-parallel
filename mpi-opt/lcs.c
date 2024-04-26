@@ -49,9 +49,9 @@ int get_index_of_character(char *str, char x, int len) {
 
 void calc_P_matrix(int *p_global, char *b, int len_b, char *c, int len_c, int rank, int num_ranks) {
 
-    if(PROFILE > 0) {
-        *begin = now();
-    }
+    #if PROFILE
+        *prof_mark = now();
+    #endif
     // determine number of elements that each rank will receive
     int *counts_c = calloc(num_ranks, sizeof(int));
     int *counts_p = calloc(num_ranks, sizeof(int));
@@ -92,25 +92,25 @@ void calc_P_matrix(int *p_global, char *b, int len_b, char *c, int len_c, int ra
             }
         }
     }
-    if(PROFILE > 0) {
-        double exec_time = tdiff(*begin, now());
+    #if PROFILE
+        double exec_time = tdiff(*prof_mark, now());
         if(chunk_size > 0) {
             printf("Rank %d P matrix computation time: %f\n", rank, exec_time);
         }
-        *begin = now();
-    }
+        *prof_mark = now();
+    #endif
     // gather all the calculated values of P matrix in process 0 and redistribute
     MPI_Gatherv(p_local, chunk_size*(len_b+1), MPI_INT, p_global, counts_p, displs_p, MPI_INT, CAPTAIN, MPI_COMM_WORLD);
-    if(PROFILE > 0) {
-        double exec_time = tdiff(*begin, now());
+    #if PROFILE
+        exec_time = tdiff(*prof_mark, now());
         if(rank == CAPTAIN) {
             printf("Rank %d P matrix mpi gather time: %f\n", rank, exec_time);
         }
-    }
+    #endif
 }
 
 
-void sync_r(int *R_prev_row, int *R_part_row, int rank, int *units_per_rank, int *displ_per_rank, int num_procs, int offset, MPI_Request *request) {
+void sync_r(int *R_prev_row, int *R_part_row, int rank, int *units_per_rank, int *displ_per_rank, int num_procs, int offset) {
 
     int units_per_self = units_per_rank[rank];
     // maybe use async send/recv with a barrier?
@@ -150,24 +150,18 @@ void sync_r(int *R_prev_row, int *R_part_row, int rank, int *units_per_rank, int
             break;
         }
     }
-
-    // update the previous row with the latest computed values from this iteration
-    #pragma omp parallel for shared(R_part_row, displ_per_rank, rank, offset) schedule(static)
-    for(int i = 0; i < units_per_self; i++) {
-        R_prev_row[displ_per_rank[rank]-offset+i] = R_part_row[i];
-    }
 }
 
 
 void distribute_p(int *P, int count, int rank) {
-    if(PROFILE > 0) {
-        *begin = now();
-    }
+    #if PROFILE
+        *prof_mark = now();
+    #endif
     MPI_Bcast(P, count, MPI_INT, CAPTAIN, MPI_COMM_WORLD);
-    if(PROFILE > 0) {
-        double exec_time = tdiff(*begin, now());
+    #if PROFILE
+        double exec_time = tdiff(*prof_mark, now());
         printf("Rank %d P matrix mpi broadcast time: %f\n", rank, exec_time);
-    }
+    #endif
 }
 
 
@@ -179,9 +173,9 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
     int n = len_b;
     int u = len_c;
 
-    if(DEBUG > 0) {
+    #if DEBUG > 0
         printf("Loop iterations (m): %d\n", m);
-    }
+    #endif
 
     int units_per_self = units_per_rank[rank];
 
@@ -205,22 +199,20 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
     int result = -1;
 
     // difference to align with partial R previous row for space optimization
-    if(DEBUG > 0) {
+    #if DEBUG > 0
         printf("Rank %d aligning data in R previous row with offset %d\n", rank, offset);
-    }
-
-    MPI_Request request;
+    #endif
 
     // this variable is the solution to space optimization by only keeping the last row for the next iteration of computations
     int R_part_row[units_per_self];
 
     for(int i=1; i < m+1; i++) {
-        if(PROFILE > 0) {
+        #if PROFILE
             if(i == PROFILE_YANG_ITER_SAMPLE) {
                 printf("Iterations: %d\n", m+1);
-                *begin = now();
+                *prof_mark = now();
             }
-        }
+        #endif
         int c_i = get_index_of_character(C, A[i-1], u);
 
         // reset the partial R row array for this iteration on this particular rank
@@ -234,7 +226,7 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
                 j = j+1;
             }
             /* VERSION 1 (branching implementation) */
-            if(USE_VERSION == 1) {
+            #if USE_VERSION == 1
                 if(A[i-1] == B[j-1]) {
                     R_part_row[j-start_id] = R_prev_row[j-1-offset] + 1;
                 }
@@ -244,25 +236,19 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
                 else {
                     R_part_row[j-start_id] = max(R_prev_row[j-offset], R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
                 }
-                // provide a level of error-handling
-                if(rank-NEIGHBOR_DIST >= 0 && P[(c_i*(n+1))+j]-1 < displ_per_rank[rank-NEIGHBOR_DIST]) {
-                    printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, rank-NEIGHBOR_DIST);
-                    fflush(stdout);
-                    MPI_Abort(MPI_COMM_WORLD, 103);
-                }
             /* VERSION 2 (no branching implementation) */
-            } else {
+            #else
                 t = (0-P[(c_i*(n+1))+j]) < 0;
                 s = (0 - (R_prev_row[j-offset] - (t*R_prev_row[P[(c_i*(n+1))+j]-1-offset]) ));
                 R_part_row[j-start_id] = ((t^1)||(s^0))*(R_prev_row[j-offset]) + (!((t^1)||(s^0)))*(R_prev_row[P[(c_i*(n+1))+j]-1-offset] + 1);
-                // provide a level of error-handling
-                if(rank-NEIGHBOR_DIST >= 0 && P[(c_i*(n+1))+j]-1 < displ_per_rank[rank-NEIGHBOR_DIST]) {
-                    printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, rank-NEIGHBOR_DIST);
-                    fflush(stdout);
-                    MPI_Abort(MPI_COMM_WORLD, 103);
-                }
+            #endif
+            // provide a level of error-handling
+            if(rank-NEIGHBOR_DIST >= 0 && P[(c_i*(n+1))+j]-1 < displ_per_rank[rank-NEIGHBOR_DIST]) {
+                printf("ERROR: Rank %d is missing data from neighbor %d; result may be incorrect\n", rank, rank-NEIGHBOR_DIST);
+                fflush(stdout);
+                MPI_Abort(MPI_COMM_WORLD, 103);
             }
-            if(DEBUG > 0) {
+            #if DEBUG > 0
                 if(highest_access < j-1) {
                     highest_access = j-1;
                 }
@@ -281,58 +267,61 @@ int lcs_yang(int *R_prev_row, int *P, char *A, char *B, char *C, int len_a, int 
                 if(lowest_access > P[(c_i*(n+1))+j]-1) {
                     lowest_access = P[(c_i*(n+1))+j]-1;
                 }
-            }
+            #endif
         }
 
-        if(PROFILE > 0) {
+        #if PROFILE
             if(i == PROFILE_YANG_ITER_SAMPLE) {
-                double exec_time = tdiff(*begin, now());
+                double exec_time = tdiff(*prof_mark, now());
                 printf("Rank %d DP partial computation time iteration %d: %f\n", rank, i, exec_time);
-                *begin = now();
+                *prof_mark = now();
             }
-        }
+        #endif
 
         // IDEA: only distribute information to the neighboring nodes that need it
         // gather and redistribute all the calculated values of DP matrix -> done!
-        sync_r(R_prev_row, R_part_row, rank, units_per_rank, displ_per_rank, num_procs, offset, &request);
+        sync_r(R_prev_row, R_part_row, rank, units_per_rank, displ_per_rank, num_procs, offset);
+        #if PROFILE
+        if(i == PROFILE_YANG_ITER_SAMPLE) {
+            double exec_time = tdiff(*prof_mark, now());
+            printf("Rank %d DP matrix mpi gather time iteration %d: %f\n", rank, i, exec_time);
+            *prof_mark = now();
+        }
+        #endif
 
-        if(PROFILE > 0) {
-            if(i == PROFILE_YANG_ITER_SAMPLE) {
-                double exec_time = tdiff(*begin, now());
-                printf("Rank %d DP matrix mpi allgather time iteration %d: %f\n", rank, i, exec_time);
-                *begin = now();
-            }
+        // update the previous row with the latest computed values from this iteration
+        #pragma omp parallel for shared(R_part_row, displ_per_rank, rank, offset) schedule(static)
+        for(int i = 0; i < units_per_self; i++) {
+            R_prev_row[displ_per_rank[rank]-offset+i] = R_part_row[i];
         }
 
         result = R_prev_row[len_r_prev_row_size-1];
 
-        // MPI_Wait(request, status);
-
-        if(PROFILE > 0) {
+        #if PROFILE
             if(i == PROFILE_YANG_ITER_SAMPLE) {
-                double exec_time = tdiff(*begin, now());
+                double exec_time = tdiff(*prof_mark, now());
                 printf("Rank %d DP matrix previous row update time iteration %d: %f\n", rank, i, exec_time);
             }
-        }
+        #endif
     }
-    if(DEBUG > 0) {
+    #if DEBUG > 0
         printf("Rank %d === start_id %d end_id %d\n", rank, start_id, end_id);
         printf("Rank %d === lowest_access %d highest_access %d\n", rank, lowest_access, highest_access);
         printf("COMM REQUIREMENT: Rank %d needed data from segment belonging to rank %d\n", rank, lowest_access/units_per_self);
         printf("COMM REQUIREMENT: Rank %d needed data from segment belonging to rank %d\n", rank, highest_access/units_per_self);
-    }
+    #endif
 
     int LAST_RANK = num_procs-1;
 
     // wait on final result from last node in the linear chain
     if(rank == LAST_RANK) {
-        if(DEBUG > 1) {
+        #if DEBUG > 1
             printf("LAST RANK R MATRIX:\n");
             for(int i = 0; i < len_r_prev_row_size; i++) {
                 printf("%d\t", R_prev_row[i]);
             }
             printf("\nEND LAST RANK R MATRIX\n");
-        }
+        #endif
 
         MPI_Send(&result, 1, MPI_INT, CAPTAIN, TAG_FINAL_R_VALUE, MPI_COMM_WORLD);
     }

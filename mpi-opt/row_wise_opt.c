@@ -44,23 +44,6 @@ int main(int argc, char *argv[]) {
     int len_a, len_b, len_c;
     double start_time, stop_time;
 
-    if(my_rank == CAPTAIN) {
-        // print stats about resource utilization
-        #pragma omp parallel
-        {   
-            #pragma omp single
-            {
-                printf("Loading DNA file \"%s\" on each of %d processes (%d threads per rank)...\n", argv[1], num_procs, omp_get_num_threads());
-                if(USE_VERSION == 1) {
-                    printf("Branching: enabled (version 1)\n");
-                } else {
-                    printf("Branching: disabled (version 2)\n");
-                }
-
-            }
-        }
-    }
-
     FILE *fp = fopen(argv[1], "r");
     if(fp == NULL) {
         printf("ERROR: Failed to open file \"%s\".\n", argv[1]);
@@ -80,12 +63,6 @@ int main(int argc, char *argv[]) {
     C_ustr = (char *)malloc((len_c+1) * sizeof(char *));
 
     fscanf(fp, "%s %s %s", A_str, B_str, C_ustr);
-
-    if(my_rank == CAPTAIN) {
-        printf("Length of string B: %zu \n", strlen(B_str));
-        printf("Length of string C: %zu\n", strlen(C_ustr));
-        printf("String C is: %s\n", C_ustr);
-    }
     
     // partition the number of units among all processes as evenly as possible
     int units_per_rank[num_procs];
@@ -110,20 +87,21 @@ int main(int argc, char *argv[]) {
         len_r_prev_row_size += units_per_rank[my_rank-i-1];
     }
 
-    if(DEBUG > 0) {
+    #if DEBUG > 0
         printf("P := Rank %d assigned %d chunks\n", my_rank, get_computation_size(len_c, my_rank, num_procs));
         printf("DP := Rank %d assigned %d chunks\n", my_rank, units_per_self);
 
         printf("displ_per_rank[%d] = %d\n", my_rank, displ_per_rank[my_rank]);
         printf("units_per_rank[%d] = %d\n", my_rank, units_per_rank[my_rank]);
         printf("Rank %d has len of R previous row: %d\n", my_rank, len_r_prev_row_size);
-    }
+    #endif
 
     R_prev_row = calloc(len_r_prev_row_size, sizeof(int));
 
     P_matrix = calloc(ROWS*COLS, sizeof(int));
 
     begin = calloc(1, sizeof(struct timespec));
+    prof_mark = calloc(1, sizeof(struct timespec));
     end = calloc(1, sizeof(struct timespec));
 
     // start timing immediately before distributing data
@@ -136,14 +114,33 @@ int main(int argc, char *argv[]) {
     // halt the timing
     *end = now();
 
+    // print diagnostics about application run
     if(my_rank == CAPTAIN) {
+        // print stats about resource utilization
+        #pragma omp parallel
+        {   
+            #pragma omp single
+            {
+                printf("Loading DNA file \"%s\" on each of %d processes (%d threads per rank)...\n", argv[1], num_procs, omp_get_num_threads());
+                #if USE_VERSION == 1
+                    printf("Branching: enabled (version 1)\n");
+                #else
+                    printf("Branching: disabled (version 2)\n");
+                #endif
+            }
+        }
+
+        printf("Length of string B: %zu \n", strlen(B_str));
+        printf("Length of string C: %zu\n", strlen(C_ustr));
+        printf("String C is: %s\n", C_ustr);
+
         printf("LCS: %d\n", result);
 
         double exec_time = tdiff(*begin, *end);
         printf("Execution time: %lf\n", exec_time);
     }
 
-    if(DEBUG > 2) {
+    #if DEBUG > 2
         if(my_rank == CAPTAIN) {
             printf("P MATRIX\n");
             for(int i = 0; i < len_c*(len_b+1); i++) {
@@ -151,7 +148,7 @@ int main(int argc, char *argv[]) {
             }
             printf("END P MATRIX\n");
         }
-    }
+    #endif
 
     // deallocate pointers
     free(A_str);
@@ -163,6 +160,7 @@ int main(int argc, char *argv[]) {
     // free(DP_Results);
 
     free(begin);
+    free(prof_mark);
     free(end);
 
     MPI_Finalize();

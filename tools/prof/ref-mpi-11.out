@@ -1,0 +1,170 @@
+Rank 25 P matrix mpi broadcast time: 0.004767
+Iterations: 131073
+Rank 25 DP partial computation time iteration 10: 0.000008
+Rank 25 DP matrix mpi gather time iteration 10: 0.000572
+Rank 25 DP matrix previous row update time iteration 10: 0.000015
+Rank 29 P matrix mpi broadcast time: 0.003379
+Iterations: 131073
+Rank 29 DP partial computation time iteration 10: 0.000138
+Rank 29 DP matrix mpi gather time iteration 10: 0.000527
+Rank 29 DP matrix previous row update time iteration 10: 0.000016
+Rank 16 P matrix mpi broadcast time: 0.013785
+Iterations: 131073
+Rank 16 DP partial computation time iteration 10: 0.000008
+Rank 16 DP matrix mpi gather time iteration 10: 0.000824
+Rank 16 DP matrix previous row update time iteration 10: 0.000015
+Rank 21 P matrix mpi broadcast time: 0.003234
+Iterations: 131073
+Rank 21 DP partial computation time iteration 10: 0.000009
+Rank 21 DP matrix mpi gather time iteration 10: 0.000562
+Rank 21 DP matrix previous row update time iteration 10: 0.000015
+Rank 31 P matrix mpi broadcast time: 0.002738
+Iterations: 131073
+Rank 31 DP partial computation time iteration 10: 0.000046
+Rank 31 DP matrix mpi gather time iteration 10: 0.000468
+Rank 31 DP matrix previous row update time iteration 10: 0.000016
+Rank 12 P matrix mpi broadcast time: 0.003840
+Iterations: 131073
+Rank 12 DP partial computation time iteration 10: 0.000009
+Rank 12 DP matrix mpi gather time iteration 10: 0.000697
+Rank 12 DP matrix previous row update time iteration 10: 0.000017
+Rank 20 P matrix mpi broadcast time: 0.002779
+Iterations: 131073
+Rank 20 DP partial computation time iteration 10: 0.000008
+Rank 20 DP matrix mpi gather time iteration 10: 0.000576
+Rank 20 DP matrix previous row update time iteration 10: 0.000016
+Rank 1 P matrix computation time: 0.025478
+Rank 1 P matrix mpi broadcast time: 0.004128
+Iterations: 131073
+Rank 1 DP partial computation time iteration 10: 0.000009
+Rank 1 DP matrix mpi gather time iteration 10: 0.000510
+Rank 1 DP matrix previous row update time iteration 10: 0.000018
+Rank 3 P matrix computation time: 0.025296
+Rank 3 P matrix mpi broadcast time: 0.003896
+Iterations: 131073
+Rank 3 DP partial computation time iteration 10: 0.000009
+Rank 3 DP matrix mpi gather time iteration 10: 0.000523
+Rank 3 DP matrix previous row update time iteration 10: 0.000016
+Rank 10 P matrix mpi broadcast time: 0.003932
+Iterations: 131073
+Rank 10 DP partial computation time iteration 10: 0.000010
+Rank 10 DP matrix mpi gather time iteration 10: 0.000555
+Rank 10 DP matrix previous row update time iteration 10: 0.000028
+Rank 8 P matrix mpi broadcast time: 0.003943
+Iterations: 131073
+Rank 8 DP partial computation time iteration 10: 0.000009
+Rank 8 DP matrix mpi gather time iteration 10: 0.000449
+Rank 8 DP matrix previous row update time iteration 10: 0.000017
+Rank 28 P matrix mpi broadcast time: 0.002731
+Iterations: 131073
+Rank 28 DP partial computation time iteration 10: 0.000011
+Rank 28 DP matrix mpi gather time iteration 10: 0.000615
+Rank 28 DP matrix previous row update time iteration 10: 0.000019
+Rank 11 P matrix mpi broadcast time: 0.003533
+Iterations: 131073
+Rank 11 DP partial computation time iteration 10: 0.000009
+Rank 11 DP matrix mpi gather time iteration 10: 0.000697
+Rank 11 DP matrix previous row update time iteration 10: 0.000017
+Rank 24 P matrix mpi broadcast time: 0.003969
+Iterations: 131073
+Rank 24 DP partial computation time iteration 10: 0.000009
+Rank 24 DP matrix mpi gather time iteration 10: 0.000471
+Rank 24 DP matrix previous row update time iteration 10: 0.000015
+Rank 17 P matrix mpi broadcast time: 0.003810
+Iterations: 131073
+Rank 17 DP partial computation time iteration 10: 0.000008
+Rank 17 DP matrix mpi gather time iteration 10: 0.000699
+Rank 17 DP matrix previous row update time iteration 10: 0.000016
+Rank 6 P matrix mpi broadcast time: 0.004756
+Iterations: 131073
+Rank 6 DP partial computation time iteration 10: 0.000010
+Rank 6 DP matrix mpi gather time iteration 10: 0.000453
+Rank 6 DP matrix previous row update time iteration 10: 0.000025
+Rank 23 P matrix mpi broadcast time: 0.002776
+Iterations: 131073
+Rank 23 DP partial computation time iteration 10: 0.000009
+Rank 23 DP matrix mpi gather time iteration 10: 0.000500
+Rank 23 DP matrix previous row update time iteration 10: 0.000016
+Rank 9 P matrix mpi broadcast time: 0.004591
+Iterations: 131073
+Rank 9 DP partial computation time iteration 10: 0.000009
+Rank 9 DP matrix mpi gather time iteration 10: 0.000574
+Rank 9 DP matrix previous row update time iteration 10: 0.000017
+Rank 7 P matrix mpi broadcast time: 0.004411
+Iterations: 131073
+Rank 7 DP partial computation time iteration 10: 0.000009
+Rank 7 DP matrix mpi gather time iteration 10: 0.000443
+Rank 7 DP matrix previous row update time iteration 10: 0.000021
+Rank 22 P matrix mpi broadcast time: 0.002579
+Iterations: 131073
+Rank 22 DP partial computation time iteration 10: 0.000009
+Rank 22 DP matrix mpi gather time iteration 10: 0.000565
+Rank 22 DP matrix previous row update time iteration 10: 0.000016
+Rank 18 P matrix mpi broadcast time: 0.003641
+Iterations: 131073
+Rank 18 DP partial computation time iteration 10: 0.000009
+Rank 18 DP matrix mpi gather time iteration 10: 0.000697
+Rank 18 DP matrix previous row update time iteration 10: 0.000015
+Rank 2 P matrix computation time: 0.025633
+Rank 2 P matrix mpi broadcast time: 0.003765
+Iterations: 131073
+Rank 2 DP partial computation time iteration 10: 0.000010
+Rank 2 DP matrix mpi gather time iteration 10: 0.000499
+Rank 2 DP matrix previous row update time iteration 10: 0.000023
+Rank 30 P matrix mpi broadcast time: 0.002722
+Iterations: 131073
+Rank 30 DP partial computation time iteration 10: 0.000143
+Rank 30 DP matrix mpi gather time iteration 10: 0.000531
+Rank 30 DP matrix previous row update time iteration 10: 0.000016
+Rank 15 P matrix mpi broadcast time: 0.004392
+Iterations: 131073
+Rank 15 DP partial computation time iteration 10: 0.000009
+Rank 15 DP matrix mpi gather time iteration 10: 0.000774
+Rank 15 DP matrix previous row update time iteration 10: 0.000017
+Rank 26 P matrix mpi broadcast time: 0.004007
+Iterations: 131073
+Rank 26 DP partial computation time iteration 10: 0.000013
+Rank 26 DP matrix mpi gather time iteration 10: 0.000519
+Rank 26 DP matrix previous row update time iteration 10: 0.000021
+Rank 19 P matrix mpi broadcast time: 0.004261
+Iterations: 131073
+Rank 19 DP partial computation time iteration 10: 0.000009
+Rank 19 DP matrix mpi gather time iteration 10: 0.000576
+Rank 19 DP matrix previous row update time iteration 10: 0.000016
+Rank 27 P matrix mpi broadcast time: 0.003941
+Iterations: 131073
+Rank 27 DP partial computation time iteration 10: 0.000025
+Rank 27 DP matrix mpi gather time iteration 10: 0.000605
+Rank 27 DP matrix previous row update time iteration 10: 0.000016
+Rank 4 P matrix mpi broadcast time: 0.004981
+Iterations: 131073
+Rank 4 DP partial computation time iteration 10: 0.000010
+Rank 4 DP matrix mpi gather time iteration 10: 0.000486
+Rank 4 DP matrix previous row update time iteration 10: 0.000023
+Rank 14 P matrix mpi broadcast time: 0.003838
+Iterations: 131073
+Rank 14 DP partial computation time iteration 10: 0.000009
+Rank 14 DP matrix mpi gather time iteration 10: 0.000659
+Rank 14 DP matrix previous row update time iteration 10: 0.000017
+Rank 5 P matrix mpi broadcast time: 0.005709
+Iterations: 131073
+Rank 5 DP partial computation time iteration 10: 0.000010
+Rank 5 DP matrix mpi gather time iteration 10: 0.000435
+Rank 5 DP matrix previous row update time iteration 10: 0.000048
+Rank 13 P matrix mpi broadcast time: 0.005133
+Iterations: 131073
+Rank 13 DP partial computation time iteration 10: 0.000009
+Rank 13 DP matrix mpi gather time iteration 10: 0.000691
+Rank 13 DP matrix previous row update time iteration 10: 0.000018
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 4096 procs: 32
+Rank 0 P matrix computation time: 0.034935
+Rank 0 P matrix mpi gather time: 0.000761
+Rank 0 P matrix mpi broadcast time: 0.014390
+Iterations: 131073
+Rank 0 DP partial computation time iteration 10: 0.000054
+Rank 0 DP matrix mpi gather time iteration 10: 0.000461
+Rank 0 DP matrix previous row update time iteration 10: 0.000017
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 40.720867
