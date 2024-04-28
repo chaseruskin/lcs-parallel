@@ -1,0 +1,50 @@
+## 11.txt, 4 ranks, 1 node per rank
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 25.683024
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 25.864031
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 27.010419
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 27.222813
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 27.167219
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 26.139780
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 25.957084
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 26.199663
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 26.171891
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 25.368993

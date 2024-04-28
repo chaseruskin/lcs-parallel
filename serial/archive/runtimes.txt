@@ -1,0 +1,51 @@
+### 11.txt
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 44.346146 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.650807 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.666170 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.585961 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 44.033294 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.909386 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.994144 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.590877 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.706871 seconds
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+Sequence lengths : 131072 131071 4
+Length of LCS is: 32767
+Time taken by sequential algorithm is: 43.646495 seconds

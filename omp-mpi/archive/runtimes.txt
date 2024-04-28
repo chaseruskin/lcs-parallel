@@ -1,0 +1,50 @@
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 52.832761
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 57.450450
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 65.333524
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 74.073424
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 53.697713
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 71.277576
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 76.998656
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 83.706403
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 78.204738
+
+Your input file: /home/c.ruskin/eel6763/project/data/11.txt 
+chunk_p: 1 chunk_dp: 32768 procs: 4
+lcs_yang_v2 is: 127963
+time taken for lcs_yang_v2 is: 108.246160

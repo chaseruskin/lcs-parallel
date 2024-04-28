@@ -19,18 +19,18 @@
 
 #SBATCH --job-name=al
 #SBATCH --mail-type=FAIL
-#SBATCH --mail-user=c.ruskin@ufl.edu
+#SBATCH --mail-user=joelalvarez@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem-per-cpu=8000mb
+#SBATCH --mem-per-cpu=64000mb
 #SBATCH -t 00:05:00
 #SBATCH --cpus-per-task=1
 
-DATA_FILE="r4"
-INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
-# INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
+DATA_FILE="11"
+# INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
+INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
 
 srun --mpi=pmix_v3 -o "hpg-$2.out" -e "hpg-$2.err" $1 $INPUT_PATH

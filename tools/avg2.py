@@ -5,17 +5,17 @@
 
 # copy/paste a snippet of the log runtimes.txt results to format and compute stats
 RAW: str = '''
---------- 32768 : 2024-04-09 17:21:09 ---------
-total time taken: 6.336605
-total time taken: 16.010738
-total time taken: 20.323807
-total time taken: 4.919467
-total time taken: 1.419508
-total time taken: 1.542067
-total time taken: 1.048408
-total time taken: 2.039756
-total time taken: 2.150442
-total time taken: 13.527157
+---------  128 : 2024-04-09 21:42:44 ---------
+time taken for lcs_yang_v1 is: 0.019729
+time taken for lcs_yang_v1 is: 0.022177
+time taken for lcs_yang_v1 is: 0.038230
+time taken for lcs_yang_v1 is: 0.056542
+time taken for lcs_yang_v1 is: 0.048627
+time taken for lcs_yang_v1 is: 0.032777
+time taken for lcs_yang_v1 is: 0.053743
+time taken for lcs_yang_v1 is: 0.044773
+time taken for lcs_yang_v1 is: 0.028842
+time taken for lcs_yang_v1 is: 0.046976
 '''
 
 # separate into lines
