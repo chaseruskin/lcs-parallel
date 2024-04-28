@@ -19,7 +19,7 @@
 
 #SBATCH --job-name=al
 #SBATCH --mail-type=FAIL
-#SBATCH --mail-user=c.ruskin@ufl.edu
+#SBATCH --mail-user=joelalvarez@ufl.edu
 #SBATCH --account=eel6763
 #SBATCH --qos=eel6763
 #SBATCH --nodes=1
@@ -31,7 +31,9 @@
 export OMP_NUM_THREADS=32
 
 DATA_FILE="11"
-INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
+# INPUT_PATH="/home/c.ruskin/eel6763/project/data/$DATA_FILE.txt"
+INPUT_PATH="/home/joelalvarez/final_project/lcs-parallel/data/$DATA_FILE.txt"
+
 
 export GMON_OUT_PREFIX="gmon.out-"
 

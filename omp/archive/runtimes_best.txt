@@ -1,0 +1,89 @@
+### 11.txt, 32 threads
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 14.143841
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 14.748996
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 11.358915
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 13.144795
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 17.684153
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 8.791101
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 9.260001
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 8.969468
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 8.703265
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 7.923519
+
+Your input file: /home/joelalvarez/final_project/lcs-parallel/data/11.txt 
+1 : 131072 131071 4
+length of string B: 131071 
+ C: 4
+string C is: ATCG
+lcs_yang_v2 is: 127963
+total time taken: 7.560735

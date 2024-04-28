@@ -1,0 +1,12 @@
+### 11.txt, 16 threads
+
+total time taken: 22.304703
+total time taken: 24.010869
+total time taken: 24.388579
+total time taken: 10.064023
+total time taken: 19.026644
+total time taken: 9.936836
+total time taken: 17.034308
+total time taken: 10.956016
+total time taken: 11.445868
+total time taken: 10.863021
