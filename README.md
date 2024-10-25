@@ -1,6 +1,12 @@
 # Analyzing LCS for DNA Sequencing using Parallel Programming Techniques
 
-The goal of this project is to port multiple implementations for a parallelized LCS aglorithm to the HiPerGator computing platform to reproduce results, profile the program, and experiment with code modifications to improve performance specifically for the HiPerGator computing platform.
+### Authors: Joel Alvarez, Chase Ruskin
+
+This project ports multiple implementations for a parallelized LCS aglorithm to the HiPerGator computing platform to reproduce results, profile the program, and experiment with code modifications that improve the run-time performance specifically for the HiPerGator computing platform.
+
+# Abstract
+
+Finding the longest common subsequence (LCS) in general is an NP-hard problem that has applications in pattern recognition, data compression, and DNA sequencing. To improve practical performance in computing the LCS, Yang et al. designed and implemented a row- wise independent version of the dynamic programming approach that removed current row data dependencies with the current row itself [1]. In this project, we focused on analyzing existing implementations of the parallel LCS algorithm for DNA sequencing for HPC systems ported to the HiPerGator computing platform to identify performance bottlenecks and optimize the MPI implementation in terms of space efficiency and execution time. By localizing processing and localizing communication through a concept called neighbor distance, we created a highly scalable, space-efficient, robust, and optimized MPI implementation that saw as much as 9.091x improvement over the best published implementation (OpenMP) and as much as 8.495x improvement over the best ported implementation with scaling (OpenMP) on HiPerGator.
 
 # 1. HiPerGator Port
 
@@ -206,5 +212,6 @@ For this input, the calculated speedup is roughly 9.00x faster than the best ori
 
 # References
 
-[1] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6458724/  
-[2] https://github.com/RayhanShikder/lcs_parallel/tree/master
+[1] https://www.iaeng.org/publication/WCE2010/WCE2010_pp499-504.pdf  
+[2] https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6458724/  
+[3] https://github.com/RayhanShikder/lcs_parallel  
